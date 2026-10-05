@@ -1,632 +1,3208 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <meta charset="utf-8">
-  <!-- iPhone notch safe-area -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Quản lý tài sản</title>
 
-  <style>
-    :root{
-      --bg:#f2f2f7;
-      --card:#ffffff;
-      --text:#111;
-      --muted:#666;
-      --primary:#007AFF;
-      --warn:#ff9500;
-      --danger:#ff3b30;
-      --success:#34C759;
-      --shadow:0 6px 20px rgba(0,0,0,0.07);
-      --radius:14px;
-      --pad:14px;
-      --gap:14px;
-      --container-max: 960px;
-    }
+<meta charset="utf-8">
 
-    /* >>> FIX TRÀN BỀ RỘNG */
-    *, *::before, *::after { box-sizing: border-box; }
-    input, button, select, textarea, canvas { max-width: 100%; display: block; }
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    html,body{ height:100%; }
-    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-    * { -webkit-tap-highlight-color: transparent; }
+<title>Quản lý tài sản</title>
 
-    body{
-      font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      margin:0;
-    }
+<style>
 
-    /* Safe areas cho tai thỏ */
-    @supports(padding: env(safe-area-inset-top)){
-      body{
-        padding-left: max(0px, env(safe-area-inset-left));
-        padding-right: max(0px, env(safe-area-inset-right));
-      }
-    }
+:root{
+  --bg:#f2f2f7;
+  --card:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --primary:#007AFF;
+  --warn:#ff9500;
+  --danger:#ff3b30;
+  --success:#34C759;
+  --shadow:0 6px 20px rgba(0,0,0,0.07);
+  --radius:14px;
+  --pad:14px;
+  --gap:14px;
+  --container-max:960px;
+}
 
-    /* Căn giữa nội dung, cách hai lề cho đẹp */
-    .container{
-      max-width: var(--container-max);
-      margin: 24px auto 40px;
-      padding: 0 16px;
-    }
 
-    .card{
-      background:var(--card);
-      padding:var(--pad);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      margin-bottom:var(--gap);
-      overflow: hidden; /* >>> Chặn viền/box-shadow của input tràn ra ngoài card */
-    }
+/* =====================================================
+   CƠ BẢN
+   ===================================================== */
 
-    h1,h2{ margin:0 0 10px; line-height:1.25; }
-    h1{ font-size:20px; text-align:center; margin-bottom:16px; }
-    h2{ font-size:16px; }
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
 
-    label{
-      font-size:12px;
-      color:var(--muted);
-      display:block;
-      margin-bottom:4px;
-    }
+input,
+button,
+select,
+textarea,
+canvas{
+  max-width:100%;
+  display:block;
+}
 
-    input, button{
-      width:100%;
-      min-height:44px;                 /* chuẩn chạm mobile */
-      font-size:16px;
-      border-radius:10px;
-    }
+html,
+body{
+  height:100%;
+}
 
-    input{
-      padding:10px 12px;
-      margin:6px 0 10px;
-      border:1px solid #e3e3e8;
-      background:#fafafa;
-      outline:none;
-      transition:border-color .15s, background .15s, box-shadow .15s;
-      
-    }
-    
-    
-    
-    input:focus{
-      border-color:var(--primary);
-      background:#fff;
-      box-shadow:0 0 0 3px rgba(0,122,255,0.12);
-    }
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
 
-    button{
-      padding:10px 12px;
-      margin-top:6px;
-      border:none;
-      font-size:13px;
-      cursor:pointer;
-      transition:transform .05s ease, filter .15s ease, background .15s ease;
-    }
-    button:active{ transform: translateY(1px); }
-    .addBtn{ background:var(--primary); color:#fff; }
-    .addBtn:hover{ filter:brightness(1.05); }
-    .editBtn{ background:var(--warn); color:#fff; width:auto; display:inline-block; margin-right:6px; }
-    .deleteBtn{ background:var(--danger); color:#fff; width:auto; display:inline-block; }
+*{
+  -webkit-tap-highlight-color:transparent;
+}
 
-    .item{
-      padding:8px 0;
-      border-bottom:1px solid #efeff4;
-      font-size:13.5px;
-    }
+body{
 
-    #assetChart{ min-height:220px; width:100%; display:block; }
+  font-family:
+    -apple-system,
+    system-ui,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
 
-    .total{
-      font-size:16px;
-      font-weight:600;
-      text-align:center;
-      background:linear-gradient(180deg, #fff, #fbfbfd);
-      border:1px solid #eee;
-    }
-    /* Sticky gần đáy, chừa safe-area-bottom */
-    .total.sticky{
-      position: sticky;
-      bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-      z-index: 5;
-    }
+  background:var(--bg);
 
-    /* Màn hình khóa toàn trang, căn giữa */
-    #lockScreen{
-      position:fixed; inset:0; width:100%; height:100%;
-      background:var(--bg);
-      display:flex; align-items:center; justify-content:center; flex-direction:column;
-      padding:24px;
-      z-index:9999;
-    }
-    @supports(padding: env(safe-area-inset-top)){
-      #lockScreen{ padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(24px, env(safe-area-inset-bottom)); }
-    }
-    #lockScreen .lock-card{
-      width:min(480px, 92%);
-      background:var(--card);
-      padding:20px;
-      border-radius:16px;
-      box-shadow:var(--shadow);
-      text-align:center;
-    }
-    #pinInput{ text-align:center; letter-spacing:2px; font-weight:600; }
+  color:var(--text);
 
-     
-    #pinInput::placeholder { font-size: 80%; }
+  margin:0;
 
-    /* Lưới 2 cột nhẹ khi màn đủ rộng */
-    .grid-2{ display:grid; gap:var(--gap); }
-    @media (min-width: 880px){ .grid-2{ grid-template-columns:1fr 1fr; } }
+  padding-top:60px;
 
-    /* Mobile nhỏ */
-    @media (max-width: 480px){
-      body{ font-size:15px; }
-      .container{ margin:16px auto 28px; }
-      .card{ padding:12px; }
-    }
-  </style>
+  padding-bottom:30px;
+}
+
+
+@supports(padding:env(safe-area-inset-top)){
+
+  body{
+
+    padding-left:
+      max(0px,env(safe-area-inset-left));
+
+    padding-right:
+      max(0px,env(safe-area-inset-right));
+
+  }
+
+}
+
+
+/* =====================================================
+   THANH TAB - HỌC THEO FILE MẪU
+   ===================================================== */
+
+.tab-bar{
+
+  position:fixed;
+
+  top:0;
+
+  left:0;
+
+  right:0;
+
+  height:60px;
+
+  background:#e5e5ea;
+
+  border-bottom:1px solid #d1d1d6;
+
+  display:flex;
+
+  align-items:center;
+
+  z-index:99;
+
+  padding-top:
+    env(safe-area-inset-top,0px);
+
+}
+
+
+.tab-divider{
+
+  width:1px;
+
+  height:28px;
+
+  background-color:#c7c7cc;
+
+}
+
+
+.tab-item{
+
+  flex:1;
+
+  height:100%;
+
+  text-align:center;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+  cursor:pointer;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:2px;
+
+  background:#e5e5ea;
+
+  opacity:.7;
+
+  transition:
+    background .2s ease,
+    opacity .2s ease,
+    color .2s ease;
+
+  user-select:none;
+
+}
+
+
+.tab-item.active{
+
+  background:#ffffff;
+
+  color:var(--primary);
+
+  font-weight:600;
+
+  opacity:1;
+
+}
+
+
+.tab-item .icon{
+
+  font-size:18px;
+
+}
+
+
+/* =====================================================
+   CONTAINER
+   ===================================================== */
+
+.container{
+
+  max-width:var(--container-max);
+
+  margin:0 auto;
+
+  padding:0 16px;
+
+}
+
+
+/* =====================================================
+   TAB CONTENT
+   ===================================================== */
+
+.tab-content{
+
+  display:none;
+
+}
+
+
+.tab-content.active{
+
+  display:block;
+
+}
+
+
+/* =====================================================
+   CARD
+   ===================================================== */
+
+.card{
+
+  background:var(--card);
+
+  padding:var(--pad);
+
+  border-radius:var(--radius);
+
+  box-shadow:var(--shadow);
+
+  margin-bottom:var(--gap);
+
+  overflow:hidden;
+
+}
+
+
+h1,
+h2{
+
+  margin:0 0 10px;
+
+  line-height:1.25;
+
+}
+
+
+h1{
+
+  font-size:20px;
+
+  text-align:center;
+
+  margin-bottom:16px;
+
+}
+
+
+h2{
+
+  font-size:16px;
+
+}
+
+
+label{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+  display:block;
+
+  margin-bottom:4px;
+
+}
+
+
+input,
+button{
+
+  width:100%;
+
+  min-height:44px;
+
+  font-size:16px;
+
+  border-radius:10px;
+
+}
+
+
+input{
+
+  padding:10px 12px;
+
+  margin:6px 0 10px;
+
+  border:1px solid #e3e3e8;
+
+  background:#fafafa;
+
+  outline:none;
+
+  transition:
+    border-color .15s,
+    background .15s,
+    box-shadow .15s;
+
+}
+
+
+input:focus{
+
+  border-color:var(--primary);
+
+  background:#fff;
+
+  box-shadow:
+    0 0 0 3px rgba(0,122,255,.12);
+
+}
+
+
+button{
+
+  padding:10px 12px;
+
+  margin-top:6px;
+
+  border:none;
+
+  font-size:13px;
+
+  cursor:pointer;
+
+  transition:
+    transform .05s ease,
+    filter .15s ease,
+    background .15s ease;
+
+}
+
+
+button:active{
+
+  transform:translateY(1px);
+
+}
+
+
+.addBtn{
+
+  background:var(--primary);
+
+  color:#fff;
+
+}
+
+
+.addBtn:hover{
+
+  filter:brightness(1.05);
+
+}
+
+
+.editBtn{
+
+  background:var(--warn);
+
+  color:#fff;
+
+  width:auto;
+
+  display:inline-block;
+
+  margin-right:6px;
+
+}
+
+
+.deleteBtn{
+
+  background:var(--danger);
+
+  color:#fff;
+
+  width:auto;
+
+  display:inline-block;
+
+}
+
+
+.item{
+
+  padding:8px 0;
+
+  border-bottom:1px solid #efeff4;
+
+  font-size:13.5px;
+
+}
+
+
+.item:last-child{
+
+  border-bottom:none;
+
+}
+
+
+#assetChart{
+
+  min-height:220px;
+
+  width:100%;
+
+  display:block;
+
+}
+
+
+.total{
+
+  font-size:16px;
+
+  font-weight:600;
+
+  text-align:center;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff,
+      #fbfbfd
+    );
+
+  border:1px solid #eee;
+
+}
+
+
+.total.sticky{
+
+  position:sticky;
+
+  bottom:
+    calc(
+      8px +
+      env(
+        safe-area-inset-bottom,
+        0px
+      )
+    );
+
+  z-index:5;
+
+}
+
+
+/* =====================================================
+   GRID
+   ===================================================== */
+
+.grid-2{
+
+  display:grid;
+
+  gap:var(--gap);
+
+}
+
+
+@media (min-width:880px){
+
+  .grid-2{
+
+    grid-template-columns:1fr 1fr;
+
+  }
+
+}
+
+
+/* =====================================================
+   MÀN HÌNH KHÓA
+   ===================================================== */
+
+#lockScreen{
+
+  position:fixed;
+
+  inset:0;
+
+  width:100%;
+
+  height:100%;
+
+  background:var(--bg);
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  flex-direction:column;
+
+  padding:24px;
+
+  z-index:9999;
+
+}
+
+
+@supports(padding:env(safe-area-inset-top)){
+
+  #lockScreen{
+
+    padding-top:
+      max(
+        24px,
+        env(safe-area-inset-top)
+      );
+
+    padding-bottom:
+      max(
+        24px,
+        env(safe-area-inset-bottom)
+      );
+
+  }
+
+}
+
+
+#lockScreen .lock-card{
+
+  width:min(480px,92%);
+
+  background:var(--card);
+
+  padding:20px;
+
+  border-radius:16px;
+
+  box-shadow:var(--shadow);
+
+  text-align:center;
+
+}
+
+
+#pinInput{
+
+  text-align:center;
+
+  letter-spacing:2px;
+
+  font-weight:600;
+
+}
+
+
+#pinInput::placeholder{
+
+  font-size:80%;
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media(max-width:480px){
+
+  body{
+
+    font-size:15px;
+
+  }
+
+
+  .container{
+
+    margin:0 auto 28px;
+
+  }
+
+
+  .card{
+
+    padding:12px;
+
+  }
+
+
+  .tab-item{
+
+    font-size:10px;
+
+  }
+
+
+  .tab-item .icon{
+
+    font-size:17px;
+
+  }
+
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-  <!-- Lock screen -->
-  <div id="lockScreen" aria-live="polite">
-    <div class="lock-card">
-      <h3 style="margin:0 0 4px;color:#2563eb">Author : LWD</h3>
-      <h2 style="margin:0 0 12px;">🔐 Nhập mật khẩu</h2>
-      <input type="password" id="pinInput" inputmode="numeric" autocomplete="one-time-code" placeholder="Nhập mật khẩu để mở ứng dụng">
-      <button class="addBtn" onclick="checkPIN()">Mở</button>
-      <p id="pinError" style="color:#e11d48;margin:8px 0 0;"></p>
-    </div>
+
+<!-- =====================================================
+     MÀN HÌNH KHÓA
+     ===================================================== -->
+
+<div
+  id="lockScreen"
+  aria-live="polite">
+
+  <div class="lock-card">
+
+    <h3
+      style="
+        margin:0 0 4px;
+        color:#2563eb;
+      ">
+
+      Author : LWD
+
+    </h3>
+
+
+    <h2
+      style="
+        margin:0 0 12px;
+      ">
+
+      🔐 Nhập mật khẩu
+
+    </h2>
+
+
+    <input
+      type="password"
+      id="pinInput"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      placeholder="Nhập mật khẩu để mở ứng dụng">
+
+
+    <button
+      class="addBtn"
+      onclick="checkPIN()">
+
+      Mở
+
+    </button>
+
+
+    <p
+      id="pinError"
+      style="
+        color:#e11d48;
+        margin:8px 0 0;
+      ">
+    </p>
+
   </div>
 
-  <div id="app" style="display:none;">
-    <div class="container">
-      <h1>Quản lý tài sản</h1>
+</div>
+
+
+
+<!-- =====================================================
+     APP
+     ===================================================== -->
+
+<div
+  id="app"
+  style="display:none;">
+
+
+  <!-- ===================================================
+       THANH TAB
+       =================================================== -->
+
+  <div class="tab-bar">
+
+
+    <!-- TAB TÀI SẢN -->
+
+    <div
+      class="tab-item active"
+      onclick="switchTab('assets',this)">
+
+      <span class="icon">
+        💰
+      </span>
+
+      <span>
+        Tài sản
+      </span>
+
+    </div>
+
+
+    <div class="tab-divider"></div>
+
+
+    <!-- TAB THỐNG KÊ -->
+
+    <div
+      class="tab-item"
+      onclick="switchTab('stats',this)">
+
+      <span class="icon">
+        📊
+      </span>
+
+      <span>
+        Thống kê
+      </span>
+
+    </div>
+
+
+    <div class="tab-divider"></div>
+
+
+    <!-- TAB CÀI ĐẶT -->
+
+    <div
+      class="tab-item"
+      onclick="switchTab('settings',this)">
+
+      <span class="icon">
+        ⚙️
+      </span>
+
+      <span>
+        Cài đặt
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+
+  <div class="container">
+
+
+    <!-- =================================================
+         TAB 1: TÀI SẢN
+         ================================================= -->
+
+    <div
+      id="tab-assets"
+      class="tab-content active"
+      style="padding-top:12px;">
+
+
+      <h1>
+        Quản lý tài sản
+      </h1>
+
+
+      <!-- VÀNG + SỔ CỨNG -->
 
       <div class="grid-2">
-        <!-- GOLD -->
+
+
+        <!-- VÀNG -->
+
         <div class="card">
-          <h2>🥇 Vàng (đơn vị: chỉ)</h2>
-          <label for="goldPrice">Đơn giá vàng (VND)</label>
-          <input type="text" id="goldPrice" inputmode="numeric" pattern="[0-9.]*" placeholder="vd: 7.500.000">
-          <hr style="border:none;border-top:1px solid #efeff4;margin:10px 0;">
-          <input type="text" id="goldName" placeholder="Tên cửa hàng">
-          <input type="number" step="0.01" id="goldQty" inputmode="decimal" placeholder="Số lượng (chỉ)">
-          <input type="text" id="goldNote" placeholder="Ghi chú">
-          <button class="addBtn" onclick="addGold()">Thêm vàng</button>
+
+          <h2>
+            🥇 Vàng
+            <span
+              style="
+                font-size:12px;
+                color:var(--muted);
+                font-weight:normal;
+              ">
+
+              (đơn vị: chỉ)
+
+            </span>
+          </h2>
+
+
+          <input
+            type="text"
+            id="goldName"
+            placeholder="Tên cửa hàng">
+
+
+          <input
+            type="number"
+            step="0.01"
+            id="goldQty"
+            inputmode="decimal"
+            placeholder="Số lượng (chỉ)">
+
+
+          <input
+            type="text"
+            id="goldNote"
+            placeholder="Ghi chú">
+
+
+          <button
+            class="addBtn"
+            onclick="addGold()">
+
+            Thêm vàng
+
+          </button>
+
+
           <div id="goldList"></div>
+
         </div>
 
-        <!-- BANK -->
+
+
+        <!-- SỔ CỨNG -->
+
         <div class="card">
-          <h2>🏦 Sổ tiết kiệm cứng</h2>
-          <input type="text" id="bankName" placeholder="Tên ngân hàng">
-          <input type="text" id="bankAmount" inputmode="numeric" pattern="[0-9.]*" placeholder="Số tiền (VND)">
-          <label for="bankDate">Ngày mở sổ</label>
-          <input type="date" id="bankDate">
-          <button class="addBtn" onclick="addBank()">Thêm sổ tiết kiệm</button>
+
+          <h2>
+            🏦 Sổ tiết kiệm cứng
+          </h2>
+
+
+          <input
+            type="text"
+            id="bankName"
+            placeholder="Tên ngân hàng">
+
+
+          <input
+            type="text"
+            id="bankAmount"
+            inputmode="numeric"
+            pattern="[0-9.]*"
+            placeholder="Số tiền (VND)">
+
+
+          <label for="bankDate">
+
+            Ngày mở sổ
+
+          </label>
+
+
+          <input
+            type="date"
+            id="bankDate">
+
+
+          <button
+            class="addBtn"
+            onclick="addBank()">
+
+            Thêm sổ tiết kiệm
+
+          </button>
+
+
           <div id="bankList"></div>
+
         </div>
+
+
       </div>
 
-      <!-- ONLINE -->
+
+
+      <!-- SỔ ONLINE -->
+
       <div class="card">
-        <h2>💳 Sổ tiết kiệm online</h2>
-        <input type="text" id="onlineAmountInput" inputmode="numeric" pattern="[0-9.]*" placeholder="Số tiền (VND)">
-        <label for="onlineDate">Ngày mở sổ</label>
-        <input type="date" id="onlineDate">
-        <button class="addBtn" onclick="addOnline()">Thêm sổ online</button>
+
+        <h2>
+          💳 Sổ tiết kiệm online
+        </h2>
+
+
+        <input
+          type="text"
+          id="onlineAmountInput"
+          inputmode="numeric"
+          pattern="[0-9.]*"
+          placeholder="Số tiền (VND)">
+
+
+        <label for="onlineDate">
+
+          Ngày mở sổ
+
+        </label>
+
+
+        <input
+          type="date"
+          id="onlineDate">
+
+
+        <button
+          class="addBtn"
+          onclick="addOnline()">
+
+          Thêm sổ online
+
+        </button>
+
+
         <div id="onlineList"></div>
+
       </div>
 
-      <!-- CHART -->
-      <div class="card">
-        <h2>📊 Tỷ lệ tài sản</h2>
-        <canvas id="assetChart" aria-label="Biểu đồ tỷ lệ tài sản" role="img"></canvas>
-        <div id="assetSummary" style="margin-top:10px;font-size:13px;"></div>
-      </div>
 
-      <!-- TOTAL (sticky) -->
-      <div class="card total sticky" id="grandTotal">
+
+      <!-- TỔNG -->
+
+      <div
+        class="card total sticky"
+        id="grandTotal">
+
         Tổng tài sản: 0 VND
+
       </div>
 
-      <!-- BACKUP / RESTORE -->
-      <div class="card">
-        <h2>🗂️ Sao lưu &amp; Phục hồi</h2>
-        <!-- Xuất JSON (mới) -->
-        <button class="addBtn" onclick="exportToJSON()">📤 Xuất file backup</button>
-        <hr style="border:none;border-top:1px solid #efeff4;margin:10px 0;">
-        <label for="restoreFile">Tải file (.json)</label>
-        <!-- Chỉ cho chọn .json để tương thích tốt với iPhone -->
-        <input type="file" id="restoreFile" accept=".json">
-        <button class="addBtn" style="background:var(--success)" onclick="importFromFile()">📥 Load dữ liệu</button>
-        <div style="margin-top:8px;font-size:12px;color:var(--muted);">
-          ⚠️ Khi phục hồi, dữ liệu hiện tại sẽ bị ghi đè.
-        </div>
-      </div>
+
     </div>
+
+
+
+    <!-- =================================================
+         TAB 2: THỐNG KÊ
+         ================================================= -->
+
+    <div
+      id="tab-stats"
+      class="tab-content"
+      style="padding-top:12px;">
+
+
+      <h1>
+        Thống kê tài sản
+      </h1>
+
+
+      <div class="card">
+
+        <h2>
+          📊 Tỷ lệ tài sản
+        </h2>
+
+
+        <canvas
+          id="assetChart"
+          aria-label="Biểu đồ tỷ lệ tài sản"
+          role="img">
+        </canvas>
+
+
+        <div
+          id="assetSummary"
+          style="
+            margin-top:10px;
+            font-size:13px;
+          ">
+        </div>
+
+
+      </div>
+
+
+      <!-- TỔNG -->
+
+      <div
+        class="card"
+        style="
+          text-align:center;
+          font-size:14px;
+        ">
+
+        <div
+          style="
+            color:var(--muted);
+            font-size:12px;
+          ">
+
+          Tổng giá trị tài sản
+
+        </div>
+
+
+        <div
+          id="statsTotal"
+          style="
+            font-size:22px;
+            font-weight:700;
+            margin-top:5px;
+          ">
+
+          0 VND
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         TAB 3: CÀI ĐẶT
+         ================================================= -->
+
+    <div
+      id="tab-settings"
+      class="tab-content"
+      style="padding-top:12px;">
+
+
+      <h1>
+        Cài đặt
+      </h1>
+
+
+      <!-- ĐƠN GIÁ VÀNG -->
+
+      <div class="card">
+
+        <h2>
+          🥇 Đơn giá vàng
+        </h2>
+
+
+        <label for="goldPrice">
+
+          Đơn giá vàng (VND/chỉ)
+
+        </label>
+
+
+        <input
+          type="text"
+          id="goldPrice"
+          inputmode="numeric"
+          pattern="[0-9.]*"
+          placeholder="vd: 7.500.000">
+
+
+        <div
+          style="
+            font-size:12px;
+            color:var(--muted);
+            margin-top:0;
+          ">
+
+          Đơn giá này được sử dụng để
+          tính giá trị số vàng trong Tab Tài sản.
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- SAO LƯU -->
+
+      <div class="card">
+
+        <h2>
+          🗂️ Sao lưu dữ liệu
+        </h2>
+
+
+        <button
+          class="addBtn"
+          onclick="exportToJSON()">
+
+          📤 Xuất file backup
+
+        </button>
+
+
+        <div
+          style="
+            margin-top:8px;
+            font-size:12px;
+            color:var(--muted);
+          ">
+
+          Xuất toàn bộ dữ liệu tài sản
+          thành file JSON.
+
+        </div>
+
+      </div>
+
+
+
+      <!-- PHỤC HỒI -->
+
+      <div class="card">
+
+        <h2>
+          📥 Phục hồi dữ liệu
+        </h2>
+
+
+        <label for="restoreFile">
+
+          Chọn file backup (.json)
+
+        </label>
+
+
+        <input
+          type="file"
+          id="restoreFile"
+          accept=".json">
+
+
+        <button
+          class="addBtn"
+          style="
+            background:var(--success);
+          "
+          onclick="importFromFile()">
+
+          📥 Load dữ liệu
+
+        </button>
+
+
+        <div
+          style="
+            margin-top:8px;
+            font-size:12px;
+            color:var(--muted);
+          ">
+
+          ⚠️ Khi phục hồi,
+          dữ liệu hiện tại sẽ bị ghi đè.
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
   </div>
 
-  <script>
-    /* ===== DOM ===== */
-    const app = document.getElementById('app');
-    const lockScreen = document.getElementById('lockScreen');
-    const pinInput = document.getElementById('pinInput');
-    const pinError = document.getElementById('pinError');
+</div>
 
-    const goldPrice = document.getElementById('goldPrice');
-    const goldName = document.getElementById('goldName');
-    const goldQty = document.getElementById('goldQty');
-    const goldNote = document.getElementById('goldNote');
-    const goldList = document.getElementById('goldList');
 
-    const bankName = document.getElementById('bankName');
-    const bankAmount = document.getElementById('bankAmount');
-    const bankDate = document.getElementById('bankDate');
-    const bankList = document.getElementById('bankList');
 
-    const onlineAmountInput = document.getElementById('onlineAmountInput');
-    const onlineDate = document.getElementById('onlineDate');
-    const onlineList = document.getElementById('onlineList');
+<script>
 
-    const assetSummary = document.getElementById('assetSummary');
-    const grandTotal = document.getElementById('grandTotal');
-    const restoreFile = document.getElementById('restoreFile');
-    const assetCanvas = document.getElementById('assetChart');
 
-    /* ===== DATA / CONFIG ===== */
-    let golds=[],banks=[],onlines=[];
-    let lockTimer;
-    const FIXED_PIN="981202";
-    let _lastTotals = { goldTotal: 0, bankTotal: 0, onlineTotal: 0 };
+/* =====================================================
+   DOM
+   ===================================================== */
 
-    /* ===== UTIL ===== */
-    function getToday(){
-      const d=new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const app =
+  document.getElementById('app');
+
+const lockScreen =
+  document.getElementById('lockScreen');
+
+const pinInput =
+  document.getElementById('pinInput');
+
+const pinError =
+  document.getElementById('pinError');
+
+
+const goldPrice =
+  document.getElementById('goldPrice');
+
+const goldName =
+  document.getElementById('goldName');
+
+const goldQty =
+  document.getElementById('goldQty');
+
+const goldNote =
+  document.getElementById('goldNote');
+
+const goldList =
+  document.getElementById('goldList');
+
+
+const bankName =
+  document.getElementById('bankName');
+
+const bankAmount =
+  document.getElementById('bankAmount');
+
+const bankDate =
+  document.getElementById('bankDate');
+
+const bankList =
+  document.getElementById('bankList');
+
+
+const onlineAmountInput =
+  document.getElementById('onlineAmountInput');
+
+const onlineDate =
+  document.getElementById('onlineDate');
+
+const onlineList =
+  document.getElementById('onlineList');
+
+
+const assetSummary =
+  document.getElementById('assetSummary');
+
+const grandTotal =
+  document.getElementById('grandTotal');
+
+const statsTotal =
+  document.getElementById('statsTotal');
+
+const restoreFile =
+  document.getElementById('restoreFile');
+
+const assetCanvas =
+  document.getElementById('assetChart');
+
+
+
+/* =====================================================
+   DATA
+   ===================================================== */
+
+let golds = [];
+
+let banks = [];
+
+let onlines = [];
+
+let lockTimer;
+
+const FIXED_PIN = "981202";
+
+
+let _lastTotals = {
+
+  goldTotal:0,
+
+  bankTotal:0,
+
+  onlineTotal:0
+
+};
+
+
+
+/* =====================================================
+   PHÂN TAB
+   HỌC THEO CẤU TRÚC FILE MẪU
+   ===================================================== */
+
+function switchTab(tabName, element){
+
+  /*
+   * Ẩn toàn bộ nội dung tab
+   */
+
+  document
+    .querySelectorAll('.tab-content')
+    .forEach(tab => {
+
+      tab.classList.remove('active');
+
+    });
+
+
+  /*
+   * Bỏ active của tất cả tab
+   */
+
+  document
+    .querySelectorAll('.tab-item')
+    .forEach(tab => {
+
+      tab.classList.remove('active');
+
+    });
+
+
+  /*
+   * Hiện tab được chọn
+   */
+
+  const target =
+    document.getElementById(
+      'tab-' + tabName
+    );
+
+
+  if(target){
+
+    target.classList.add('active');
+
+  }
+
+
+  /*
+   * Đánh dấu tab đang chọn
+   */
+
+  if(element){
+
+    element.classList.add('active');
+
+  }
+
+
+  /*
+   * Khi vào Thống kê,
+   * vẽ lại biểu đồ.
+   */
+
+  if(tabName === 'stats'){
+
+    setTimeout(() => {
+
+      drawChart(
+        _lastTotals.goldTotal,
+        _lastTotals.bankTotal,
+        _lastTotals.onlineTotal
+      );
+
+    },30);
+
+  }
+
+}
+
+
+window.switchTab = switchTab;
+
+
+
+/* =====================================================
+   UTIL
+   ===================================================== */
+
+function getToday(){
+
+  const d =
+    new Date();
+
+
+  return `${d.getFullYear()}-${
+    String(
+      d.getMonth()+1
+    ).padStart(2,"0")
+  }-${
+    String(
+      d.getDate()
+    ).padStart(2,"0")
+  }`;
+
+}
+
+
+function formatNumber(num){
+
+  const n =
+    Number(num) || 0;
+
+
+  return n
+    .toString()
+    .replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      "."
+    );
+
+}
+
+
+function parseNumber(str){
+
+  return Number(
+    (str || "")
+      .toString()
+      .replace(/\./g,"")
+  ) || 0;
+
+}
+
+
+function formatInput(input){
+
+  input.addEventListener(
+    "input",
+    () => {
+
+      let v =
+        (input.value || "")
+          .replace(/\D/g,"");
+
+
+      input.value =
+        v
+          ? formatNumber(
+              Number(v)
+            )
+          : "";
+
     }
-    function formatNumber(num){
-      const n = Number(num)||0;
-      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+  );
+
+}
+
+
+function clampMoney(n){
+
+  n =
+    Number(n) || 0;
+
+
+  return n < 0 ? 0 : n;
+
+}
+
+
+function clampQty(n){
+
+  n =
+    Number(n) || 0;
+
+
+  return n < 0 ? 0 : n;
+
+}
+
+
+function debounce(fn,wait=120){
+
+  let t;
+
+
+  return (...a) => {
+
+    clearTimeout(t);
+
+
+    t =
+      setTimeout(
+        () => fn(...a),
+        wait
+      );
+
+  };
+
+}
+
+
+
+/* =====================================================
+   AUTO LOCK
+   ===================================================== */
+
+function resetTimer(){
+
+  clearTimeout(lockTimer);
+
+
+  lockTimer =
+    setTimeout(
+      () => lockApp(),
+      180000
+    );
+
+}
+
+
+function lockApp(){
+
+  app.style.display =
+    "none";
+
+
+  lockScreen.style.display =
+    "flex";
+
+
+  pinInput.value = "";
+
+}
+
+
+
+/* =====================================================
+   PIN
+   ===================================================== */
+
+function checkPIN(){
+
+  if(
+    pinInput.value === FIXED_PIN
+  ){
+
+    lockScreen.style.display =
+      "none";
+
+
+    app.style.display =
+      "block";
+
+
+    loadData();
+
+
+    if(
+      !bankDate.value
+    ){
+
+      bankDate.value =
+        getToday();
+
     }
-    function parseNumber(str){
-      return Number((str||"").toString().replace(/\./g,""))||0;
+
+
+    if(
+      !onlineDate.value
+    ){
+
+      onlineDate.value =
+        getToday();
+
     }
-    function formatInput(input){
-      input.addEventListener("input",()=>{
-        let v=(input.value||"").replace(/\D/g,"");
-        input.value=v?formatNumber(Number(v)):"";
-      });
+
+
+    resetTimer();
+
+
+    pinError.innerText = "";
+
+  }
+
+  else{
+
+    pinError.innerText =
+      "Sai mật khẩu!";
+
+  }
+
+}
+
+
+window.checkPIN =
+  checkPIN;
+
+
+pinInput.addEventListener(
+  'keydown',
+  e => {
+
+    if(
+      e.key === 'Enter'
+    ){
+
+      checkPIN();
+
     }
-    function clampMoney(n){ n = Number(n)||0; return n < 0 ? 0 : n; }
-    function clampQty(n){ n = Number(n)||0; return n < 0 ? 0 : n; }
-    function debounce(fn, wait=120){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),wait); }; }
 
-    /* ===== AUTO LOCK ===== */
-    function resetTimer(){ clearTimeout(lockTimer); lockTimer=setTimeout(()=>lockApp(),180000); }
-    function lockApp(){ app.style.display="none"; lockScreen.style.display="flex"; pinInput.value=""; }
+  }
+);
 
-    /* ===== PIN ===== */
-    function checkPIN(){
-      if(pinInput.value===FIXED_PIN){
-        lockScreen.style.display="none";
-        app.style.display="block";
-        loadData();
 
-        if (!bankDate.value) bankDate.value = getToday();
-        if (!onlineDate.value) onlineDate.value = getToday();
 
-        resetTimer(); pinError.innerText="";
-        setTimeout(()=>goldPrice?.focus(), 100);
-      }else{
-        pinError.innerText="Sai mật khẩu!";
+/* =====================================================
+   STORAGE
+   ===================================================== */
+
+function saveData(){
+
+  localStorage.setItem(
+    "golds",
+    JSON.stringify(golds)
+  );
+
+
+  localStorage.setItem(
+    "banks",
+    JSON.stringify(banks)
+  );
+
+
+  localStorage.setItem(
+    "onlines",
+    JSON.stringify(onlines)
+  );
+
+
+  localStorage.setItem(
+    "goldPrice",
+    goldPrice.value
+  );
+
+}
+
+
+function loadData(){
+
+  golds =
+    JSON.parse(
+      localStorage.getItem("golds")
+    ) || [];
+
+
+  banks =
+    JSON.parse(
+      localStorage.getItem("banks")
+    ) || [];
+
+
+  onlines =
+    JSON.parse(
+      localStorage.getItem("onlines")
+    ) || [];
+
+
+  goldPrice.value =
+    localStorage.getItem(
+      "goldPrice"
+    ) || "";
+
+
+  render();
+
+}
+
+
+
+/* =====================================================
+   VÀNG
+   ===================================================== */
+
+function addGold(){
+
+  if(
+    !goldName.value ||
+    !goldQty.value
+  ){
+
+    return;
+
+  }
+
+
+  golds.push({
+
+    name:
+      goldName.value,
+
+    qty:
+      clampQty(
+        Number(
+          goldQty.value
+        )
+      ),
+
+    note:
+      goldNote.value || ""
+
+  });
+
+
+  goldName.value = "";
+
+  goldQty.value = "";
+
+  goldNote.value = "";
+
+
+  saveData();
+
+  render();
+
+  resetTimer();
+
+}
+
+
+function editGold(i){
+
+  let g =
+    golds[i];
+
+
+  let n =
+    prompt(
+      "Tên cửa hàng:",
+      g.name
+    );
+
+
+  if(n === null){
+
+    return;
+
+  }
+
+
+  n =
+    n.trim() || g.name;
+
+
+  let q =
+    prompt(
+      "Số lượng:",
+      g.qty
+    );
+
+
+  if(q === null){
+
+    return;
+
+  }
+
+
+  q =
+    clampQty(q);
+
+
+  let note =
+    prompt(
+      "Ghi chú:",
+      g.note || ""
+    );
+
+
+  if(note === null){
+
+    return;
+
+  }
+
+
+  golds[i] = {
+
+    name:n,
+
+    qty:Number(q),
+
+    note:note
+
+  };
+
+
+  saveData();
+
+  render();
+
+}
+
+
+function deleteGold(i){
+
+  if(
+    confirm(
+      "Xoá mục này?"
+    )
+  ){
+
+    golds.splice(i,1);
+
+    saveData();
+
+    render();
+
+  }
+
+}
+
+
+window.addGold =
+  addGold;
+
+window.editGold =
+  editGold;
+
+window.deleteGold =
+  deleteGold;
+
+
+
+/* =====================================================
+   SỔ CỨNG
+   ===================================================== */
+
+function addBank(){
+
+  if(
+    !bankName.value ||
+    !bankAmount.value
+  ){
+
+    return;
+
+  }
+
+
+  banks.push({
+
+    name:
+      bankName.value,
+
+    amount:
+      clampMoney(
+        parseNumber(
+          bankAmount.value
+        )
+      ),
+
+    date:
+      bankDate.value ||
+      getToday()
+
+  });
+
+
+  bankName.value = "";
+
+  bankAmount.value = "";
+
+  bankDate.value = "";
+
+
+  saveData();
+
+  render();
+
+  resetTimer();
+
+}
+
+
+function editBank(i){
+
+  let b =
+    banks[i];
+
+
+  let n =
+    prompt(
+      "Tên ngân hàng:",
+      b.name
+    );
+
+
+  if(n === null){
+
+    return;
+
+  }
+
+
+  n =
+    n.trim() || b.name;
+
+
+  let a =
+    prompt(
+      "Số tiền:",
+      formatNumber(
+        b.amount
+      )
+    );
+
+
+  if(a === null){
+
+    return;
+
+  }
+
+
+  a =
+    clampMoney(
+      parseNumber(a)
+    );
+
+
+  let d =
+    prompt(
+      "Ngày mở:",
+      b.date ||
+      getToday()
+    );
+
+
+  if(d === null){
+
+    return;
+
+  }
+
+
+  d =
+    d || b.date;
+
+
+  banks[i] = {
+
+    name:n,
+
+    amount:a,
+
+    date:d
+
+  };
+
+
+  saveData();
+
+  render();
+
+}
+
+
+function deleteBank(i){
+
+  if(
+    confirm(
+      "Xoá mục này?"
+    )
+  ){
+
+    banks.splice(i,1);
+
+    saveData();
+
+    render();
+
+  }
+
+}
+
+
+window.addBank =
+  addBank;
+
+window.editBank =
+  editBank;
+
+window.deleteBank =
+  deleteBank;
+
+
+
+/* =====================================================
+   SỔ ONLINE
+   ===================================================== */
+
+function addOnline(){
+
+  if(
+    !onlineAmountInput.value
+  ){
+
+    return;
+
+  }
+
+
+  onlines.push({
+
+    amount:
+      clampMoney(
+        parseNumber(
+          onlineAmountInput.value
+        )
+      ),
+
+    date:
+      onlineDate.value ||
+      getToday()
+
+  });
+
+
+  onlineAmountInput.value = "";
+
+  onlineDate.value = "";
+
+
+  saveData();
+
+  render();
+
+  resetTimer();
+
+}
+
+
+function editOnline(i){
+
+  let o =
+    onlines[i];
+
+
+  let a =
+    prompt(
+      "Số tiền:",
+      formatNumber(
+        o.amount
+      )
+    );
+
+
+  if(a === null){
+
+    return;
+
+  }
+
+
+  a =
+    clampMoney(
+      parseNumber(a)
+    );
+
+
+  let d =
+    prompt(
+      "Ngày mở:",
+      o.date ||
+      getToday()
+    );
+
+
+  if(d === null){
+
+    return;
+
+  }
+
+
+  d =
+    d || o.date;
+
+
+  onlines[i] = {
+
+    amount:a,
+
+    date:d
+
+  };
+
+
+  saveData();
+
+  render();
+
+}
+
+
+function deleteOnline(i){
+
+  if(
+    confirm(
+      "Xoá mục này?"
+    )
+  ){
+
+    onlines.splice(i,1);
+
+    saveData();
+
+    render();
+
+  }
+
+}
+
+
+window.addOnline =
+  addOnline;
+
+window.editOnline =
+  editOnline;
+
+window.deleteOnline =
+  deleteOnline;
+
+
+
+/* =====================================================
+   BIỂU ĐỒ
+   ===================================================== */
+
+function drawChart(
+  goldTotal,
+  bankTotal,
+  onlineTotal
+){
+
+  const canvas =
+    assetCanvas;
+
+
+  if(!canvas){
+
+    return;
+
+  }
+
+
+  const parentW =
+    canvas.parentElement
+      ? canvas.parentElement.clientWidth
+      : 320;
+
+
+  const cssWidth =
+    canvas.clientWidth ||
+    parentW ||
+    320;
+
+
+  const cssHeight =
+    240;
+
+
+  const dpr =
+    window.devicePixelRatio ||
+    1;
+
+
+  canvas.style.height =
+    cssHeight + "px";
+
+
+  canvas.width =
+    Math.max(
+      240,
+      cssWidth
+    ) * dpr;
+
+
+  canvas.height =
+    cssHeight * dpr;
+
+
+  const ctx =
+    canvas.getContext('2d');
+
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
+
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  const data = [
+
+    goldTotal,
+
+    bankTotal,
+
+    onlineTotal
+
+  ];
+
+
+  const colors = [
+
+    '#FFD700',
+
+    '#007AFF',
+
+    '#34C759'
+
+  ];
+
+
+  const icons = [
+
+    '🥇',
+
+    '🏦',
+
+    '💳'
+
+  ];
+
+
+  const total =
+    data.reduce(
+      (a,b) => a+b,
+      0
+    );
+
+
+  const cx =
+    (canvas.width / dpr) / 2;
+
+
+  const cy =
+    (canvas.height / dpr) / 2 + 5;
+
+
+  const radius =
+    Math.min(
+      canvas.width / dpr,
+      canvas.height / dpr
+    ) / 2 - 10;
+
+
+  if(total <= 0){
+
+    ctx.fillStyle = '#999';
+
+    ctx.font =
+      'bold 14px -apple-system,system-ui,Segoe UI,Roboto,Arial';
+
+    ctx.textAlign =
+      'center';
+
+    ctx.fillText(
+      'Chưa có dữ liệu để vẽ biểu đồ',
+      cx,
+      cy
+    );
+
+    return;
+
+  }
+
+
+  let start =
+    -Math.PI / 2;
+
+
+  for(
+    let i=0;
+    i<data.length;
+    i++
+  ){
+
+    const v =
+      data[i];
+
+
+    if(v <= 0){
+
+      continue;
+
+    }
+
+
+    const angle =
+      v / total *
+      Math.PI * 2;
+
+
+    const end =
+      start + angle;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+      cx,
+      cy
+    );
+
+
+    ctx.arc(
+      cx,
+      cy,
+      radius,
+      start,
+      end,
+      false
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+      colors[i];
+
+
+    ctx.fill();
+
+
+    const mid =
+      (start + end) / 2;
+
+
+    const rx =
+      cx +
+      Math.cos(mid) *
+      radius *
+      .65;
+
+
+    const ry =
+      cy +
+      Math.sin(mid) *
+      radius *
+      .65;
+
+
+    const pct =
+      (
+        v /
+        total *
+        100
+      ).toFixed(1) + '%';
+
+
+    ctx.lineWidth = 4;
+
+    ctx.strokeStyle =
+      'rgba(0,0,0,.25)';
+
+
+    ctx.font =
+      'bold 13px -apple-system,system-ui,Segoe UI,Roboto,Arial';
+
+
+    ctx.textAlign =
+      'center';
+
+
+    ctx.textBaseline =
+      'middle';
+
+
+    ctx.strokeText(
+      `${icons[i]} ${pct}`,
+      rx,
+      ry
+    );
+
+
+    ctx.fillStyle =
+      '#fff';
+
+
+    ctx.fillText(
+      `${icons[i]} ${pct}`,
+      rx,
+      ry
+    );
+
+
+    start =
+      end;
+
+  }
+
+
+  ctx.beginPath();
+
+
+  ctx.arc(
+    cx,
+    cy,
+    radius,
+    0,
+    Math.PI * 2
+  );
+
+
+  ctx.lineWidth = 1;
+
+
+  ctx.strokeStyle =
+    'rgba(255,255,255,.8)';
+
+
+  ctx.stroke();
+
+}
+
+
+
+/* =====================================================
+   RENDER
+   ===================================================== */
+
+function render(){
+
+  let price =
+    parseNumber(
+      goldPrice.value
+    );
+
+
+  goldPrice.value =
+    price
+      ? formatNumber(price)
+      : "";
+
+
+  /* ===============================
+     VÀNG
+     =============================== */
+
+  let goldTotal = 0;
+
+
+  goldList.innerHTML =
+    golds.map(
+      (g,i) => {
+
+        const qty =
+          Math.max(
+            0,
+            Number(g.qty) || 0
+          );
+
+
+        const total =
+          qty * price;
+
+
+        goldTotal +=
+          total;
+
+
+        return `
+          <div class="item">
+
+            ${g.name}
+            -
+            ${qty}
+            chỉ
+            ×
+            ${formatNumber(price)}
+            =
+            ${formatNumber(total)}
+            VND
+
+            ${
+              g.note
+                ? `<br>📝 ${g.note}`
+                : ""
+            }
+
+            <br>
+
+            <button
+              class="editBtn"
+              onclick="editGold(${i})">
+
+              Sửa
+
+            </button>
+
+            <button
+              class="deleteBtn"
+              onclick="deleteGold(${i})">
+
+              Xoá
+
+            </button>
+
+          </div>
+        `;
+
       }
-    }
-    window.checkPIN = checkPIN;
-    pinInput.addEventListener('keydown', e => { if(e.key==='Enter'){ checkPIN(); } });
+    ).join("");
 
-    /* ===== STORAGE ===== */
-    function saveData(){
-      localStorage.setItem("golds",JSON.stringify(golds));
-      localStorage.setItem("banks",JSON.stringify(banks));
-      localStorage.setItem("onlines",JSON.stringify(onlines));
-      localStorage.setItem("goldPrice",goldPrice.value);
-    }
-    function loadData(){
-      golds=JSON.parse(localStorage.getItem("golds"))||[];
-      banks=JSON.parse(localStorage.getItem("banks"))||[];
-      onlines=JSON.parse(localStorage.getItem("onlines"))||[];
-      goldPrice.value=localStorage.getItem("goldPrice")||"";
-      render();
-    }
 
-    /* ===== CRUD ===== */
-    function addGold(){
-      if(!goldName.value||!goldQty.value)return;
-      golds.push({name:goldName.value,qty:clampQty(Number(goldQty.value)),note:goldNote.value||""});
-      goldName.value="";goldQty.value="";goldNote.value="";
-      saveData();render();resetTimer();
-    }
-    function editGold(i){
-      let g=golds[i];
-      let n=prompt("Tên cửa hàng:",g.name); if(n===null)return; n=n.trim()||g.name;
-      let q=prompt("Số lượng:", g.qty); if(q===null)return; q=clampQty(q);
-      let note=prompt("Ghi chú:", g.note||""); if(note===null)return;
-      golds[i]={name:n,qty:Number(q),note:note};
-      saveData();render();
-    }
-    function deleteGold(i){ if(confirm("Xoá mục này?")){ golds.splice(i,1); saveData(); render(); } }
-    window.addGold = addGold; window.editGold = editGold; window.deleteGold = deleteGold;
 
-    function addBank(){
-      if(!bankName.value||!bankAmount.value)return;
-      banks.push({name:bankName.value,amount:clampMoney(parseNumber(bankAmount.value)),date:bankDate.value||getToday()});
-      bankName.value="";bankAmount.value="";bankDate.value="";
-      saveData();render();resetTimer();
-    }
-    function editBank(i){
-      let b=banks[i];
-      let n=prompt("Tên ngân hàng:",b.name); if(n===null)return; n=n.trim()||b.name;
-      let a=prompt("Số tiền:",formatNumber(b.amount)); if(a===null)return; a=clampMoney(parseNumber(a));
-      let d=prompt("Ngày mở:",b.date||getToday()); if(d===null)return; d=d||b.date;
-      banks[i]={name:n,amount:a,date:d}; saveData(); render();
-    }
-    function deleteBank(i){ if(confirm("Xoá mục này?")){ banks.splice(i,1); saveData(); render(); } }
-    window.addBank = addBank; window.editBank = editBank; window.deleteBank = deleteBank;
+  /* ===============================
+     SỔ CỨNG
+     =============================== */
 
-    function addOnline(){
-      if(!onlineAmountInput.value)return;
-      onlines.push({amount:clampMoney(parseNumber(onlineAmountInput.value)),date:onlineDate.value||getToday()});
-      onlineAmountInput.value="";onlineDate.value="";
-      saveData();render();resetTimer();
-    }
-    function editOnline(i){
-      let o=onlines[i];
-      let a=prompt("Số tiền:",formatNumber(o.amount)); if(a===null)return; a=clampMoney(parseNumber(a));
-      let d=prompt("Ngày mở:",o.date||getToday()); if(d===null)return; d=d||o.date;
-      onlines[i]={amount:a,date:d}; saveData(); render();
-    }
-    function deleteOnline(i){ if(confirm("Xoá mục này?")){ onlines.splice(i,1); saveData(); render(); } }
-    window.addOnline = addOnline; window.editOnline = editOnline; window.deleteOnline = deleteOnline;
+  let bankTotal = 0;
 
-    /* ===== CHART (Canvas thuần, offline) ===== */
-    function drawChart(goldTotal, bankTotal, onlineTotal){
-      const canvas = assetCanvas; if (!canvas) return;
 
-      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth : 320;
-      const cssWidth = (canvas.clientWidth || parentW || 320);
-      const cssHeight = 240;
-      const dpr = window.devicePixelRatio || 1;
+  bankList.innerHTML =
+    banks.map(
+      (b,i) => {
 
-      canvas.style.height = cssHeight + "px";
-      canvas.width  = Math.max(240, cssWidth) * dpr;
-      canvas.height = cssHeight * dpr;
+        const amt =
+          Math.max(
+            0,
+            Number(b.amount) || 0
+          );
 
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      const data   = [goldTotal, bankTotal, onlineTotal];
-      const colors = ['#FFD700','#007AFF','#34C759'];
-      const icons  = ['🥇','🏦','💳'];
-      const total  = data.reduce((a,b)=>a+b,0);
+        bankTotal +=
+          amt;
 
-      const cx = (canvas.width/dpr)/2;
-      const cy = (canvas.height/dpr)/2 + 5;
-      const radius = Math.min((canvas.width/dpr), (canvas.height/dpr))/2 - 10;
 
-      if (total <= 0) {
-        ctx.fillStyle = '#999';
-        ctx.font = 'bold 14px -apple-system,system-ui,Segoe UI,Roboto,Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Chưa có dữ liệu để vẽ biểu đồ', cx, cy);
-        return;
+        return `
+          <div class="item">
+
+            ${b.name}
+            -
+            ${formatNumber(amt)}
+            VND
+
+            <br>
+
+            Ngày mở:
+            ${b.date}
+
+            <br>
+
+            <button
+              class="editBtn"
+              onclick="editBank(${i})">
+
+              Sửa
+
+            </button>
+
+            <button
+              class="deleteBtn"
+              onclick="deleteBank(${i})">
+
+              Xoá
+
+            </button>
+
+          </div>
+        `;
+
       }
+    ).join("");
 
-      let start = -Math.PI/2;
-      for (let i=0;i<data.length;i++){
-        const v = data[i];
-        if (v <= 0) continue;
-        const angle = v/total * Math.PI*2;
-        const end = start + angle;
 
-        ctx.beginPath();
-        ctx.moveTo(cx,cy);
-        ctx.arc(cx,cy,radius,start,end,false);
-        ctx.closePath();
-        ctx.fillStyle = colors[i];
-        ctx.fill();
 
-        const mid = (start+end)/2;
-        const rx = cx + Math.cos(mid)*radius*0.65;
-        const ry = cy + Math.sin(mid)*radius*0.65;
-        const pct = (v/total*100).toFixed(1)+'%';
+  /* ===============================
+     SỔ ONLINE
+     =============================== */
 
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-        ctx.font = 'bold 13px -apple-system,system-ui,Segoe UI,Roboto,Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.strokeText(`${icons[i]} ${pct}`, rx, ry);
-        ctx.fillStyle = '#fff';
-        ctx.fillText(`${icons[i]} ${pct}`, rx, ry);
+  let onlineTotal = 0;
 
-        start = end;
+
+  onlineList.innerHTML =
+    onlines.map(
+      (o,i) => {
+
+        const amt =
+          Math.max(
+            0,
+            Number(o.amount) || 0
+          );
+
+
+        onlineTotal +=
+          amt;
+
+
+        return `
+          <div class="item">
+
+            ${formatNumber(amt)}
+            VND
+
+            <br>
+
+            Ngày mở:
+            ${o.date}
+
+            <br>
+
+            <button
+              class="editBtn"
+              onclick="editOnline(${i})">
+
+              Sửa
+
+            </button>
+
+            <button
+              class="deleteBtn"
+              onclick="deleteOnline(${i})">
+
+              Xoá
+
+            </button>
+
+          </div>
+        `;
+
       }
+    ).join("");
 
-      ctx.beginPath();
-      ctx.arc(cx,cy,radius,0,Math.PI*2);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.stroke();
-    }
 
-    /* ===== RENDER ===== */
-    function render(){
-      let price=parseNumber(goldPrice.value);
-      goldPrice.value=price?formatNumber(price):"";
 
-      let goldTotal=0;
-      goldList.innerHTML=golds.map((g,i)=>{
-        const qty = Math.max(0, Number(g.qty)||0);
-        const total=qty*price;
-        goldTotal+=total;
-        return `<div class="item">
-${g.name} - ${qty} chỉ × ${formatNumber(price)} = ${formatNumber(total)} VND
-${g.note ? `<br>📝 ${g.note}` : ""}
-<br>
-<button class="editBtn" onclick="editGold(${i})">Sửa</button>
-<button class="deleteBtn" onclick="deleteGold(${i})">Xoá</button>
-</div>`;
-      }).join("");
+  /* ===============================
+     TỔNG
+     =============================== */
 
-      let bankTotal=0;
-      bankList.innerHTML=banks.map((b,i)=>{
-        const amt = Math.max(0, Number(b.amount)||0);
-        bankTotal+=amt;
-        return `<div class="item">
-${b.name} - ${formatNumber(amt)} VND
-<br>Ngày mở: ${b.date}
-<br>
-<button class="editBtn" onclick="editBank(${i})">Sửa</button>
-<button class="deleteBtn" onclick="deleteBank(${i})">Xoá</button>
-</div>`;
-      }).join("");
+  const totalAsset =
+    goldTotal +
+    bankTotal +
+    onlineTotal;
 
-      let onlineTotal=0;
-      onlineList.innerHTML=onlines.map((o,i)=>{
-        const amt = Math.max(0, Number(o.amount)||0);
-        onlineTotal+=amt;
-        return `<div class="item">
-${formatNumber(amt)} VND
-<br>Ngày mở: ${o.date}
-<br>
-<button class="editBtn" onclick="editOnline(${i})">Sửa</button>
-<button class="deleteBtn" onclick="deleteOnline(${i})">Xoá</button>
-</div>`;
-      }).join("");
 
-      grandTotal.innerText="Tổng tài sản: "+formatNumber(goldTotal+bankTotal+onlineTotal)+" VND";
+  grandTotal.innerText =
+    "Tổng tài sản: " +
+    formatNumber(
+      totalAsset
+    ) +
+    " VND";
 
-      assetSummary.innerHTML=`
-        🥇 Vàng: <b>${formatNumber(goldTotal)} VND</b><br>
-        🏦 Sổ cứng: <b>${formatNumber(bankTotal)} VND</b><br>
-        💳 Sổ online: <b>${formatNumber(onlineTotal)} VND</b>
-      `;
 
-      _lastTotals = { goldTotal, bankTotal, onlineTotal };
-      drawChart(goldTotal, bankTotal, onlineTotal);
-    }
+  statsTotal.innerText =
+    formatNumber(
+      totalAsset
+    ) +
+    " VND";
 
-    /* ===== BACKUP / RESTORE ===== */
 
-    // Xuất file JSON (mới, thay cho .js)
-    function exportToJSON(){
+
+  /* ===============================
+     THỐNG KÊ
+     =============================== */
+
+  assetSummary.innerHTML = `
+
+    🥇 Vàng:
+    <b>
+      ${formatNumber(goldTotal)}
+      VND
+    </b>
+
+    <br>
+
+    🏦 Sổ cứng:
+    <b>
+      ${formatNumber(bankTotal)}
+      VND
+    </b>
+
+    <br>
+
+    💳 Sổ online:
+    <b>
+      ${formatNumber(onlineTotal)}
+      VND
+    </b>
+
+  `;
+
+
+  _lastTotals = {
+
+    goldTotal,
+
+    bankTotal,
+
+    onlineTotal
+
+  };
+
+
+  drawChart(
+    goldTotal,
+    bankTotal,
+    onlineTotal
+  );
+
+}
+
+
+
+/* =====================================================
+   SAO LƯU JSON
+   ===================================================== */
+
+function exportToJSON(){
+
+  try{
+
+    const snapshot = {
+
+      goldPrice:
+        parseNumber(
+          goldPrice.value ||
+          "0"
+        ),
+
+      golds:golds,
+
+      banks:banks,
+
+      onlines:onlines
+
+    };
+
+
+    const blob =
+      new Blob(
+        [
+          JSON.stringify(
+            snapshot,
+            null,
+            2
+          )
+        ],
+        {
+          type:
+            "application/json;charset=utf-8"
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const a =
+      document.createElement(
+        "a"
+      );
+
+
+    const ts =
+      new Date();
+
+
+    const pad =
+      n =>
+        String(n)
+          .padStart(2,'0');
+
+
+    const filename =
+      `QLTS_backup_${
+        ts.getFullYear()
+      }${
+        pad(
+          ts.getMonth()+1
+        )
+      }${
+        pad(
+          ts.getDate()
+        )
+      }_${
+        pad(
+          ts.getHours()
+        )
+      }${
+        pad(
+          ts.getMinutes()
+        )
+      }${
+        pad(
+          ts.getSeconds()
+        )
+      }.json`;
+
+
+    a.href =
+      url;
+
+
+    a.download =
+      filename;
+
+
+    document.body.appendChild(
+      a
+    );
+
+
+    a.click();
+
+
+    a.remove();
+
+
+    URL.revokeObjectURL(
+      url
+    );
+
+  }
+
+  catch(e){
+
+    console.error(e);
+
+    alert(
+      "Lỗi khi xuất JSON! Vui lòng thử lại."
+    );
+
+  }
+
+}
+
+
+window.exportToJSON =
+  exportToJSON;
+
+
+
+/* =====================================================
+   PHỤC HỒI JSON
+   ===================================================== */
+
+function importFromFile(){
+
+  const file =
+    restoreFile.files[0];
+
+
+  if(!file){
+
+    alert(
+      "Vui lòng chọn file .json để phục hồi."
+    );
+
+    return;
+
+  }
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    function(evt){
+
       try{
-        const snapshot = {
-          goldPrice: parseNumber(goldPrice.value || "0"),
-          golds: golds,
-          banks: banks,
-          onlines: onlines
-        };
-        const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
-          type: "application/json;charset=utf-8"
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        const ts = new Date(), pad = n => String(n).padStart(2, '0');
-        const filename = `QLTS_backup_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}${pad(ts.getSeconds())}.json`;
-        a.href = url; 
-        a.download = filename; 
-        document.body.appendChild(a); 
-        a.click(); 
-        a.remove();
-        URL.revokeObjectURL(url);
-      }catch(e){
-        console.error(e);
-        alert("Lỗi khi xuất JSON! Vui lòng thử lại.");
-      }
-    }
-    window.exportToJSON = exportToJSON;
 
-    function importFromFile(){
-      const file = restoreFile.files[0];
-      if(!file){ alert("Vui lòng chọn file .json để phục hồi."); return; }
-      const reader=new FileReader();
-      reader.onload=function(evt){
-        try{
-          const text=evt.target.result; let data;
-          // Với file .json xuất từ app: đọc JSON trực tiếp
-          if (/\.json$/i.test(file.name)) data = JSON.parse(text);
-          else {
-            // Vẫn hỗ trợ đọc kiểu .js (cũ) nếu cần (dù UI không chọn .js)
-            const match = text.match(/ASSET_BACKUP\s*=\s*(\{[\s\S]*\})\s*;?/);
-            if(!match) throw new Error("Không tìm thấy dữ liệu ASSET_BACKUP trong file .js");
-            data = JSON.parse(match[1]);
-          }
-          if (!data || !('golds' in data) || !('banks' in data) || !('onlines' in data))
-            throw new Error("Cấu trúc file không hợp lệ.");
+        const text =
+          evt.target.result;
 
-          const fileCounts =
-            `Vàng: ${Array.isArray(data.golds)?data.golds.length:0} mục\n`+
-            `Sổ cứng: ${Array.isArray(data.banks)?data.banks.length:0} mục\n`+
-            `Sổ online: ${Array.isArray(data.onlines)?data.onlines.length:0} mục\n`+
-            `Đơn giá vàng: ${data.goldPrice ? formatNumber(Number(data.goldPrice))+' VND' : '—'}`;
-          const confirmMsg =
+
+        const data =
+          JSON.parse(
+            text
+          );
+
+
+        if(
+          !data ||
+          !('golds' in data) ||
+          !('banks' in data) ||
+          !('onlines' in data)
+        ){
+
+          throw new Error(
+            "Cấu trúc file không hợp lệ."
+          );
+
+        }
+
+
+        const fileCounts =
+
+          `Vàng: ${
+            Array.isArray(
+              data.golds
+            )
+              ? data.golds.length
+              : 0
+          } mục\n` +
+
+          `Sổ cứng: ${
+            Array.isArray(
+              data.banks
+            )
+              ? data.banks.length
+              : 0
+          } mục\n` +
+
+          `Sổ online: ${
+            Array.isArray(
+              data.onlines
+            )
+              ? data.onlines.length
+              : 0
+          } mục\n` +
+
+          `Đơn giá vàng: ${
+            data.goldPrice
+              ? formatNumber(
+                  Number(
+                    data.goldPrice
+                  )
+                ) +
+                ' VND'
+              : '—'
+          }`;
+
+
+        const confirmMsg =
+
 `Phục hồi dữ liệu từ file "${file.name}".
 
 Dữ liệu hiện tại sẽ bị GHI ĐÈ hoàn toàn bởi dữ liệu trong file.
 
 Nội dung trong file:
+
 ${fileCounts}
 
 Bạn có chắc chắn muốn TIẾP TỤC?`;
-          if (!confirm(confirmMsg)) return;
 
-          golds = Array.isArray(data.golds) ? data.golds : [];
-          banks = Array.isArray(data.banks) ? data.banks : [];
-          onlines = Array.isArray(data.onlines) ? data.onlines : [];
-          const gp = Number(data.goldPrice || 0);
-          goldPrice.value = gp ? formatNumber(gp) : "";
 
-          saveData(); render(); resetTimer();
-        }catch(err){ console.error(err); alert("Phục hồi thất bại: " + (err.message || "Lỗi không xác định")); }
-      };
-      reader.onerror=function(){ alert("Không đọc được file. Vui lòng thử lại."); };
-      reader.readAsText(file,'utf-8');
-    }
-    window.importFromFile = importFromFile;
+        if(
+          !confirm(
+            confirmMsg
+          )
+        ){
 
-    /* ===== INIT ===== */
-    formatInput(goldPrice);
-    formatInput(bankAmount);
-    formatInput(onlineAmountInput);
+          return;
 
-    // Đơn giá vàng đổi -> cập nhật realtime
-    function onGoldPriceInput(){ saveData(); render(); resetTimer(); }
-    goldPrice.addEventListener('input', onGoldPriceInput);
-    goldPrice.addEventListener('change', onGoldPriceInput);
-    goldPrice.addEventListener('blur', onGoldPriceInput);
+        }
 
-    document.addEventListener("click",resetTimer,{passive:true});
-    document.addEventListener("keydown",resetTimer);
 
-    // Vẽ lại chart khi xoay/đổi kích thước (debounce)
-    window.addEventListener('resize', debounce(()=>{
-      drawChart(_lastTotals.goldTotal, _lastTotals.bankTotal, _lastTotals.onlineTotal);
-    }, 120));
+        golds =
+          Array.isArray(
+            data.golds
+          )
+            ? data.golds
+            : [];
 
-    window.onload = function(){
-      lockScreen.style.display="flex";
-      if (bankDate && !bankDate.value) bankDate.value = getToday();
-      if (onlineDate && !onlineDate.value) onlineDate.value = getToday();
+
+        banks =
+          Array.isArray(
+            data.banks
+          )
+            ? data.banks
+            : [];
+
+
+        onlines =
+          Array.isArray(
+            data.onlines
+          )
+            ? data.onlines
+            : [];
+
+
+        const gp =
+          Number(
+            data.goldPrice ||
+            0
+          );
+
+
+        goldPrice.value =
+          gp
+            ? formatNumber(gp)
+            : "";
+
+
+        saveData();
+
+        render();
+
+        resetTimer();
+
+
+        alert(
+          "Phục hồi dữ liệu thành công!"
+        );
+
+      }
+
+      catch(err){
+
+        console.error(err);
+
+        alert(
+          "Phục hồi thất bại: " +
+          (
+            err.message ||
+            "Lỗi không xác định"
+          )
+        );
+
+      }
+
     };
-  </script>
+
+
+  reader.onerror =
+    function(){
+
+      alert(
+        "Không đọc được file. Vui lòng thử lại."
+      );
+
+    };
+
+
+  reader.readAsText(
+    file,
+    'utf-8'
+  );
+
+}
+
+
+window.importFromFile =
+  importFromFile;
+
+
+
+/* =====================================================
+   ĐỊNH DẠNG INPUT
+   ===================================================== */
+
+formatInput(
+  goldPrice
+);
+
+
+formatInput(
+  bankAmount
+);
+
+
+formatInput(
+  onlineAmountInput
+);
+
+
+
+/* =====================================================
+   ĐƠN GIÁ VÀNG
+   ===================================================== */
+
+function onGoldPriceInput(){
+
+  saveData();
+
+  render();
+
+  resetTimer();
+
+}
+
+
+goldPrice.addEventListener(
+  'input',
+  onGoldPriceInput
+);
+
+
+goldPrice.addEventListener(
+  'change',
+  onGoldPriceInput
+);
+
+
+goldPrice.addEventListener(
+  'blur',
+  onGoldPriceInput
+);
+
+
+
+/* =====================================================
+   AUTO LOCK
+   ===================================================== */
+
+document.addEventListener(
+  "click",
+  resetTimer,
+  {
+    passive:true
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  resetTimer
+);
+
+
+
+/* =====================================================
+   RESIZE BIỂU ĐỒ
+   ===================================================== */
+
+window.addEventListener(
+  'resize',
+  debounce(
+    () => {
+
+      drawChart(
+        _lastTotals.goldTotal,
+        _lastTotals.bankTotal,
+        _lastTotals.onlineTotal
+      );
+
+    },
+    120
+  )
+);
+
+
+
+/* =====================================================
+   KHỞI ĐỘNG
+   ===================================================== */
+
+window.onload =
+  function(){
+
+    lockScreen.style.display =
+      "flex";
+
+
+    if(
+      bankDate &&
+      !bankDate.value
+    ){
+
+      bankDate.value =
+        getToday();
+
+    }
+
+
+    if(
+      onlineDate &&
+      !onlineDate.value
+    ){
+
+      onlineDate.value =
+        getToday();
+
+    }
+
+  };
+
+
+</script>
 
 </body>
+
 </html>
