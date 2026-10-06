@@ -11,7 +11,7 @@
 
 <title>Quản lý tài sản</title>
 
-<link rel="apple-touch-icon" href="IMG_5.jpg">
+<link rel="apple-touch-icon" href="IMG_10.jpg">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007AFF">
 
@@ -1190,6 +1190,56 @@ button:active{
 
 
 
+      <!-- TỰ ĐỘNG KHÓA -->
+
+      <div class="card">
+
+        <h2>
+          🔒 Tự động khóa ứng dụng
+        </h2>
+
+        <label for="autoLockSelect">
+          Tự động khóa sau khi không thao tác
+        </label>
+
+        <select
+          id="autoLockSelect"
+          style="
+            width:100%;
+            box-sizing:border-box;
+            border:1px solid rgba(127,127,127,.25);
+            border-radius:12px;
+            padding:12px 13px;
+            font:inherit;
+            background:rgba(127,127,127,.07);
+            color:inherit;
+            outline:none;
+          ">
+
+          <option value="0">Tắt tự động khóa</option>
+          <option value="1">1 phút</option>
+          <option value="3">3 phút</option>
+          <option value="5">5 phút</option>
+          <option value="10">10 phút</option>
+          <option value="30">30 phút</option>
+
+        </select>
+
+        <div
+          style="
+            font-size:12px;
+            color:var(--muted);
+            margin-top:8px;
+          ">
+
+          Khi hết thời gian không có thao tác,
+          ứng dụng sẽ tự khóa và yêu cầu nhập lại mật khẩu.
+
+        </div>
+
+      </div>
+
+
       <!-- SAO LƯU -->
 
       <div class="card">
@@ -1439,6 +1489,10 @@ const statsTotal =
 const restoreFile =
   document.getElementById('restoreFile');
 
+const autoLockSelect =
+  document.getElementById('autoLockSelect');
+
+
 const assetCanvas =
   document.getElementById('assetChart');
 
@@ -1454,6 +1508,9 @@ let banks = [];
 let onlines = [];
 
 let lockTimer;
+
+const AUTO_LOCK_STORAGE_KEY = "autoLockMinutes";
+const DEFAULT_AUTO_LOCK_MINUTES = 3;
 
 const FIXED_PIN = "981202";
 
@@ -1673,21 +1730,95 @@ function debounce(fn,wait=120){
    AUTO LOCK
    ===================================================== */
 
+function getAutoLockMinutes(){
+
+  const saved =
+    Number(
+      localStorage.getItem(
+        AUTO_LOCK_STORAGE_KEY
+      )
+    );
+
+  if(
+    Number.isFinite(saved) &&
+    saved >= 0
+  ){
+
+    return saved;
+
+  }
+
+  return DEFAULT_AUTO_LOCK_MINUTES;
+
+}
+
+
+function loadAutoLockSetting(){
+
+  const minutes =
+    getAutoLockMinutes();
+
+  if(autoLockSelect){
+
+    autoLockSelect.value =
+      String(minutes);
+
+  }
+
+}
+
+
+function saveAutoLockSetting(){
+
+  const minutes =
+    Number(
+      autoLockSelect.value
+    );
+
+  localStorage.setItem(
+    AUTO_LOCK_STORAGE_KEY,
+    String(
+      Number.isFinite(minutes)
+        ? Math.max(0, minutes)
+        : DEFAULT_AUTO_LOCK_MINUTES
+    )
+  );
+
+  resetTimer();
+
+}
+
+
 function resetTimer(){
 
   clearTimeout(lockTimer);
 
+  lockTimer = null;
+
+  const minutes =
+    getAutoLockMinutes();
+
+  /* 0 = tắt tự động khóa */
+  if(minutes <= 0){
+
+    return;
+
+  }
 
   lockTimer =
     setTimeout(
       () => lockApp(),
-      180000
+      minutes * 60 * 1000
     );
 
 }
 
 
 function lockApp(){
+
+  clearTimeout(lockTimer);
+
+  lockTimer = null;
 
   app.style.display =
     "none";
@@ -3224,6 +3355,16 @@ goldPrice.addEventListener(
    AUTO LOCK
    ===================================================== */
 
+if(autoLockSelect){
+
+  autoLockSelect.addEventListener(
+    "change",
+    saveAutoLockSetting
+  );
+
+}
+
+
 document.addEventListener(
   "click",
   resetTimer,
@@ -3266,6 +3407,8 @@ window.addEventListener(
 
 window.onload =
   function(){
+
+    loadAutoLockSetting();
 
     lockScreen.style.display =
       "flex";
