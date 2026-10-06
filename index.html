@@ -713,6 +713,24 @@ button:active{
 
 }
 
+
+/* ===== MODAL SỬA RIÊNG TỪNG HẠNG MỤC ===== */
+.edit-modal-backdrop{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45);backdrop-filter:blur(5px)}
+.edit-modal-backdrop.show{display:flex}
+.edit-modal{width:min(520px,100%);max-height:min(90vh,760px);overflow:auto;background:var(--card,#fff);color:var(--text,#111);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:20px}
+.edit-modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.edit-modal-title{margin:0;font-size:20px;font-weight:800}
+.edit-modal-close{width:36px;height:36px;border:0;border-radius:50%;background:rgba(127,127,127,.12);color:inherit;font-size:24px;line-height:1;cursor:pointer}
+.edit-modal-grid{display:grid;gap:14px}.edit-field{display:grid;gap:7px}
+.edit-field label{font-size:13px;font-weight:700;color:var(--muted,#666)}
+.edit-field input,.edit-field textarea{width:100%;box-sizing:border-box;border:1px solid rgba(127,127,127,.25);border-radius:12px;padding:12px 13px;font:inherit;background:rgba(127,127,127,.07);color:inherit;outline:none}
+.edit-field textarea{min-height:88px;resize:vertical}
+.edit-field input:focus,.edit-field textarea:focus{border-color:var(--primary,#007AFF);box-shadow:0 0 0 3px rgba(0,122,255,.12)}
+.edit-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.edit-modal-actions button{border:0;border-radius:12px;padding:11px 17px;font:inherit;font-weight:700;cursor:pointer}
+.edit-cancel{background:rgba(127,127,127,.14);color:inherit}.edit-save{background:var(--primary,#007AFF);color:#fff}
+@media(max-width:480px){.edit-modal{padding:16px;border-radius:18px}.edit-modal-actions{position:sticky;bottom:0;background:var(--card,#fff);padding-top:10px}}
+
 </style>
 
 </head>
@@ -1264,6 +1282,93 @@ button:active{
 
 
 
+
+<!-- ===== MODAL SỬA VÀNG ===== -->
+<div id="goldEditModal" class="edit-modal-backdrop" aria-hidden="true">
+  <div class="edit-modal" role="dialog" aria-modal="true">
+    <div class="edit-modal-header">
+      <h2 class="edit-modal-title">Chỉnh sửa vàng</h2>
+      <button type="button" class="edit-modal-close" id="goldEditClose">×</button>
+    </div>
+    <form id="goldEditForm">
+      <div class="edit-modal-grid">
+        <div class="edit-field">
+          <label for="goldEditName">Tên cửa hàng</label>
+          <input id="goldEditName" type="text" autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="goldEditQty">Số lượng</label>
+          <input id="goldEditQty" type="text" inputmode="decimal">
+        </div>
+        <div class="edit-field">
+          <label for="goldEditNote">Ghi chú</label>
+          <textarea id="goldEditNote"></textarea>
+        </div>
+      </div>
+      <div class="edit-modal-actions">
+        <button type="button" class="edit-cancel" id="goldEditCancel">Hủy</button>
+        <button type="submit" class="edit-save">Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== MODAL SỬA SỔ TIẾT KIỆM CỨNG ===== -->
+<div id="bankEditModal" class="edit-modal-backdrop" aria-hidden="true">
+  <div class="edit-modal" role="dialog" aria-modal="true">
+    <div class="edit-modal-header">
+      <h2 class="edit-modal-title">Chỉnh sửa sổ tiết kiệm cứng</h2>
+      <button type="button" class="edit-modal-close" id="bankEditClose">×</button>
+    </div>
+    <form id="bankEditForm">
+      <div class="edit-modal-grid">
+        <div class="edit-field">
+          <label for="bankEditName">Tên ngân hàng</label>
+          <input id="bankEditName" type="text" autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="bankEditAmount">Số tiền</label>
+          <input id="bankEditAmount" type="text" inputmode="decimal">
+        </div>
+        <div class="edit-field">
+          <label for="bankEditDate">Ngày mở</label>
+          <input id="bankEditDate" type="date">
+        </div>
+      </div>
+      <div class="edit-modal-actions">
+        <button type="button" class="edit-cancel" id="bankEditCancel">Hủy</button>
+        <button type="submit" class="edit-save">Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== MODAL SỬA SỔ TIẾT KIỆM ONLINE ===== -->
+<div id="onlineEditModal" class="edit-modal-backdrop" aria-hidden="true">
+  <div class="edit-modal" role="dialog" aria-modal="true">
+    <div class="edit-modal-header">
+      <h2 class="edit-modal-title">Chỉnh sửa sổ tiết kiệm online</h2>
+      <button type="button" class="edit-modal-close" id="onlineEditClose">×</button>
+    </div>
+    <form id="onlineEditForm">
+      <div class="edit-modal-grid">
+        <div class="edit-field">
+          <label for="onlineEditAmount">Số tiền</label>
+          <input id="onlineEditAmount" type="text" inputmode="decimal">
+        </div>
+        <div class="edit-field">
+          <label for="onlineEditDate">Ngày mở</label>
+          <input id="onlineEditDate" type="date">
+        </div>
+      </div>
+      <div class="edit-modal-actions">
+        <button type="button" class="edit-cancel" id="onlineEditCancel">Hủy</button>
+        <button type="submit" class="edit-save">Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 
 /* =====================================================
@@ -1450,6 +1555,25 @@ function getToday(){
 
 }
 
+
+function formatDateVN(value){
+  const s = String(value || "").trim();
+  if(!s) return "";
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(m) return `${String(m[3]).padStart(2,"0")}/${String(m[2]).padStart(2,"0")}/${m[1]}`;
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return `${String(m[1]).padStart(2,"0")}/${String(m[2]).padStart(2,"0")}/${m[3]}`;
+  return s;
+}
+
+function normalizeDateForInput(value){
+  const s = String(value || "").trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+  return "";
+}
 
 function formatNumber(num){
 
@@ -1770,76 +1894,14 @@ function addGold(){
 
 
 function editGold(i){
-
-  let g =
-    golds[i];
-
-
-  let n =
-    prompt(
-      "Tên cửa hàng:",
-      g.name
-    );
-
-
-  if(n === null){
-
-    return;
-
-  }
-
-
-  n =
-    n.trim() || g.name;
-
-
-  let q =
-    prompt(
-      "Số lượng:",
-      g.qty
-    );
-
-
-  if(q === null){
-
-    return;
-
-  }
-
-
-  q =
-    clampQty(q);
-
-
-  let note =
-    prompt(
-      "Ghi chú:",
-      g.note || ""
-    );
-
-
-  if(note === null){
-
-    return;
-
-  }
-
-
-  golds[i] = {
-
-    name:n,
-
-    qty:Number(q),
-
-    note:note
-
-  };
-
-
-  saveData();
-
-  render();
-
+  const g = golds[i];
+  if(!g) return;
+  editingGoldIndex = i;
+  goldEditName.value = g.name || "";
+  goldEditQty.value = g.qty ?? "";
+  goldEditNote.value = g.note || "";
+  showEditModal(goldEditModal);
+  setTimeout(() => goldEditName.focus(), 30);
 }
 
 
@@ -1924,85 +1986,14 @@ function addBank(){
 
 
 function editBank(i){
-
-  let b =
-    banks[i];
-
-
-  let n =
-    prompt(
-      "Tên ngân hàng:",
-      b.name
-    );
-
-
-  if(n === null){
-
-    return;
-
-  }
-
-
-  n =
-    n.trim() || b.name;
-
-
-  let a =
-    prompt(
-      "Số tiền:",
-      formatNumber(
-        b.amount
-      )
-    );
-
-
-  if(a === null){
-
-    return;
-
-  }
-
-
-  a =
-    clampMoney(
-      parseNumber(a)
-    );
-
-
-  let d =
-    prompt(
-      "Ngày mở:",
-      b.date ||
-      getToday()
-    );
-
-
-  if(d === null){
-
-    return;
-
-  }
-
-
-  d =
-    d || b.date;
-
-
-  banks[i] = {
-
-    name:n,
-
-    amount:a,
-
-    date:d
-
-  };
-
-
-  saveData();
-
-  render();
-
+  const b = banks[i];
+  if(!b) return;
+  editingBankIndex = i;
+  bankEditName.value = b.name || "";
+  bankEditAmount.value = formatNumber(b.amount || 0);
+  bankEditDate.value = normalizeDateForInput(b.date || "");
+  showEditModal(bankEditModal);
+  setTimeout(() => bankEditName.focus(), 30);
 }
 
 
@@ -2081,67 +2072,126 @@ function addOnline(){
 
 
 function editOnline(i){
-
-  let o =
-    onlines[i];
-
-
-  let a =
-    prompt(
-      "Số tiền:",
-      formatNumber(
-        o.amount
-      )
-    );
-
-
-  if(a === null){
-
-    return;
-
-  }
-
-
-  a =
-    clampMoney(
-      parseNumber(a)
-    );
-
-
-  let d =
-    prompt(
-      "Ngày mở:",
-      o.date ||
-      getToday()
-    );
-
-
-  if(d === null){
-
-    return;
-
-  }
-
-
-  d =
-    d || o.date;
-
-
-  onlines[i] = {
-
-    amount:a,
-
-    date:d
-
-  };
-
-
-  saveData();
-
-  render();
-
+  const o = onlines[i];
+  if(!o) return;
+  editingOnlineIndex = i;
+  onlineEditAmount.value = formatNumber(o.amount || 0);
+  onlineEditDate.value = normalizeDateForInput(o.date || "");
+  showEditModal(onlineEditModal);
+  setTimeout(() => onlineEditAmount.focus(), 30);
 }
 
+
+
+/* ===== LOGIC 3 FORM SỬA RIÊNG ===== */
+const goldEditModal = document.getElementById("goldEditModal");
+const bankEditModal = document.getElementById("bankEditModal");
+const onlineEditModal = document.getElementById("onlineEditModal");
+
+let editingGoldIndex = null;
+let editingBankIndex = null;
+let editingOnlineIndex = null;
+
+function showEditModal(modal){
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+}
+function hideEditModal(modal){
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+}
+
+document.getElementById("goldEditForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  if(editingGoldIndex === null) return;
+  const g = golds[editingGoldIndex];
+  if(!g) return;
+  const name = goldEditName.value.trim();
+  const qty = clampQty(goldEditQty.value);
+  if(!name) return alert("Vui lòng nhập tên cửa hàng.");
+  if(!(Number(qty) > 0)) return alert("Vui lòng nhập số lượng hợp lệ.");
+  golds[editingGoldIndex] = {
+    name:name,
+    qty:Number(qty),
+    note:goldEditNote.value
+  };
+  saveData();
+  render();
+  resetTimer();
+  hideEditModal(goldEditModal);
+  editingGoldIndex = null;
+});
+
+document.getElementById("bankEditForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  if(editingBankIndex === null) return;
+  const b = banks[editingBankIndex];
+  if(!b) return;
+  const name = bankEditName.value.trim();
+  const amount = clampMoney(parseNumber(bankEditAmount.value));
+  const date = bankEditDate.value || b.date || getToday();
+  if(!name) return alert("Vui lòng nhập tên ngân hàng.");
+  if(!(amount > 0)) return alert("Vui lòng nhập số tiền hợp lệ.");
+  banks[editingBankIndex] = {
+    name:name,
+    amount:amount,
+    date:date
+  };
+  saveData();
+  render();
+  resetTimer();
+  hideEditModal(bankEditModal);
+  editingBankIndex = null;
+});
+
+document.getElementById("onlineEditForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  if(editingOnlineIndex === null) return;
+  const o = onlines[editingOnlineIndex];
+  if(!o) return;
+  const amount = clampMoney(parseNumber(onlineEditAmount.value));
+  const date = onlineEditDate.value || o.date || getToday();
+  if(!(amount > 0)) return alert("Vui lòng nhập số tiền hợp lệ.");
+  onlines[editingOnlineIndex] = {
+    amount:amount,
+    date:date
+  };
+  saveData();
+  render();
+  resetTimer();
+  hideEditModal(onlineEditModal);
+  editingOnlineIndex = null;
+});
+
+[
+  ["goldEditClose","goldEditCancel",goldEditModal],
+  ["bankEditClose","bankEditCancel",bankEditModal],
+  ["onlineEditClose","onlineEditCancel",onlineEditModal]
+].forEach(function(item){
+  const closeId = item[0];
+  const cancelId = item[1];
+  const modal = item[2];
+  document.getElementById(closeId).addEventListener("click",function(){
+    hideEditModal(modal);
+  });
+  document.getElementById(cancelId).addEventListener("click",function(){
+    hideEditModal(modal);
+  });
+  modal.addEventListener("click",function(e){
+    if(e.target === modal) hideEditModal(modal);
+  });
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.key === "Escape"){
+    hideEditModal(goldEditModal);
+    hideEditModal(bankEditModal);
+    hideEditModal(onlineEditModal);
+    editingGoldIndex = null;
+    editingBankIndex = null;
+    editingOnlineIndex = null;
+  }
+});
 
 function deleteOnline(i){
 
@@ -2591,7 +2641,7 @@ function render(){
             <br>
 
             Ngày mở:
-            ${b.date}
+            ${formatDateVN(b.date)}
 
             <br>
 
@@ -2645,7 +2695,7 @@ function render(){
             <br>
 
             Ngày mở:
-            ${o.date}
+            ${formatDateVN(o.date)}
 
             <br>
 
