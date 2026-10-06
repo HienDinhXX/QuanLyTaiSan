@@ -11,7 +11,7 @@
 
 <title>Quản lý tài sản</title>
 
-<link rel="apple-touch-icon" href="IMG_10.jpg">
+<link rel="apple-touch-icon" href="IMG_5.jpg">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007AFF">
 
@@ -456,6 +456,69 @@ button:active{
 
   display:block;
 
+}
+
+/* Bảng chi tiết thống kê */
+.stats-table-wrap{
+  margin-top:14px;
+  border:1px solid #ececf1;
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.stats-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.stats-table th{
+  padding:10px 9px;
+  background:#f7f7fa;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.2px;
+}
+
+.stats-table td{
+  padding:12px 9px;
+  border-top:1px solid #f0f0f4;
+  vertical-align:middle;
+}
+
+.stats-table th:not(:first-child),
+.stats-table td:not(:first-child){
+  text-align:right;
+}
+
+.stats-rank{
+  width:28px;
+  color:#999;
+  font-size:11px;
+}
+
+.stats-name{
+  text-align:left !important;
+  font-weight:600;
+}
+
+.stats-value{
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.stats-percent{
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.stats-empty{
+  padding:14px !important;
+  text-align:center !important;
+  color:var(--muted);
 }
 
 
@@ -1010,10 +1073,7 @@ button:active{
 
         <div
           id="assetSummary"
-          style="
-            margin-top:10px;
-            font-size:13px;
-          ">
+          class="stats-table-wrap">
         </div>
 
 
@@ -2633,29 +2693,71 @@ function render(){
     " VND";
 
 
+  const statsRows = [
+
+    {
+      name: '🥇 Vàng',
+      value: goldTotal
+    },
+
+    {
+      name: '🏦 Sổ tiết kiệm cứng',
+      value: bankTotal
+    },
+
+    {
+      name: '💳 Sổ tiết kiệm online',
+      value: onlineTotal
+    }
+
+  ].sort((a,b) => b.value - a.value);
+
+
   assetSummary.innerHTML = `
 
-    🥇 Vàng:
-    <b>
-      ${formatNumber(goldTotal)}
-      VND
-    </b>
+    <table class="stats-table">
 
-    <br>
+      <thead>
+        <tr>
+          <th class="stats-rank">#</th>
+          <th class="stats-name">Loại tài sản</th>
+          <th>Giá trị</th>
+          <th>Tỷ lệ</th>
+        </tr>
+      </thead>
 
-    🏦 Sổ cứng:
-    <b>
-      ${formatNumber(bankTotal)}
-      VND
-    </b>
+      <tbody>
+        ${totalAsset > 0
+          ? statsRows.map((item, index) => {
 
-    <br>
+              const pct =
+                item.value / totalAsset * 100;
 
-    💳 Sổ online:
-    <b>
-      ${formatNumber(onlineTotal)}
-      VND
-    </b>
+              return `
+                <tr>
+                  <td class="stats-rank">${index + 1}</td>
+                  <td class="stats-name">${item.name}</td>
+                  <td class="stats-value">
+                    ${formatNumber(item.value)} VND
+                  </td>
+                  <td class="stats-percent">
+                    ${pct.toFixed(1)}%
+                  </td>
+                </tr>
+              `;
+
+            }).join('')
+          : `
+              <tr>
+                <td colspan="4" class="stats-empty">
+                  Chưa có dữ liệu tài sản
+                </td>
+              </tr>
+            `
+        }
+      </tbody>
+
+    </table>
 
   `;
 
