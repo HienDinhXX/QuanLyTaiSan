@@ -1,3451 +1,596 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="vi" data-theme="dark">
 <head>
-
 <meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-
 <title>Quản lý tài sản</title>
-
-<link rel="apple-touch-icon" href="IMG_AA1.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quản lý tài sản">
+<meta name="theme-color" content="#0B0B14" id="themeMeta">
+<meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#007AFF">
-
-<meta
-  name="apple-mobile-web-app-capable"
-  content="yes">
-
-<meta
-  name="apple-mobile-web-app-title"
-  content="Quản lý tài sản">
-
-<meta
-  name="apple-mobile-web-app-status-bar-style"
-  content="default">
-
-
+<link rel="apple-touch-icon" href="IMG_AA1.jpg">
+<script>
+(function(){var t='dark',a='violet';try{t=localStorage.getItem('theme')==='light'?'light':'dark';
+a=localStorage.getItem('accent')||'violet';if(['violet','ocean','forest','sunset'].indexOf(a)<0)a='violet';}catch(e){}
+document.documentElement.setAttribute('data-theme',t);document.documentElement.setAttribute('data-accent',a);
+document.getElementById('themeMeta').setAttribute('content',t==='light'?'#F3F3F9':'#0B0B14');})();
+</script>
 <style>
-
 :root{
-  --bg:#f2f2f7;
-  --card:#ffffff;
-  --text:#111;
-  --muted:#666;
-  --primary:#007AFF;
-  --warn:#ff9500;
-  --danger:#ff3b30;
-  --success:#34C759;
-  --shadow:0 6px 20px rgba(0,0,0,0.07);
-  --radius:14px;
-  --pad:14px;
-  --gap:14px;
-  --container-max:960px;
+  --bg:#0B0B14; --card:#161622; --card2:#1E1E2E; --text:#F4F4FA; --muted:#9D9DB8;
+  --line:rgba(255,255,255,.08); --soft:rgba(255,255,255,.06); --track:rgba(255,255,255,.05);
+  /* màu chủ đề (đổi theo data-accent): --violet/--pink = 2 màu chính, --accent3 = màu thứ 3 của thẻ tổng */
+  --violet:#7C3AED; --pink:#EC4899; --accent3:#FF8A3D; --a1rgb:124,58,237; --a2rgb:236,72,153;
+  --red:#FF5C7A; --blue:#5B9BFF;
+  --glow1:rgba(var(--a1rgb),.45); --glow2:rgba(91,155,255,.18); --glow3:rgba(var(--a2rgb),.18);
+  --rgb-gold:255,181,46; --rgb-hard:110,140,255; --rgb-online:31,215,192;
+  --navbg:rgba(18,18,28,.78); --navshadow:rgba(0,0,0,.5); --toast:#2A2A3C; --scrim:rgba(0,0,0,.55);
+  --g-gold:linear-gradient(135deg,#FFD54A,#FF9F1C);
+  --g-hard:linear-gradient(135deg,#5B9BFF,#7B5CFF);
+  --g-online:linear-gradient(135deg,#22E6A8,#12B5F0);
+  color-scheme:dark;
+  --c-gold:#FFB52E; --c-hard:#6E8CFF; --c-online:#1FD7C0; --btnshadow:rgba(0,0,0,.3);
 }
-
-
-/* =====================================================
-   CƠ BẢN
-   ===================================================== */
-
-*,
-*::before,
-*::after{
-  box-sizing:border-box;
+:root[data-theme="light"]{
+  --bg:#F3F3F9; --card:#FFFFFF; --card2:#F0F0F7; --text:#16161F; --muted:#6B6B85;
+  --line:rgba(20,20,45,.09); --soft:rgba(20,20,45,.06); --track:rgba(20,20,45,.07);
+  color-scheme:light;
+  --red:#E5365A; --blue:#2F6FE0;
+  --glow1:rgba(var(--a1rgb),.20); --glow2:rgba(91,155,255,.16); --glow3:rgba(var(--a2rgb),.12);
+  --rgb-gold:217,138,0; --rgb-hard:74,98,224; --rgb-online:10,158,140;
+  --navbg:rgba(255,255,255,.82); --navshadow:rgba(40,40,80,.18); --toast:#2A2A3C; --scrim:rgba(20,20,40,.4);
+  --c-gold:#D98A00; --c-hard:#4A62E0; --c-online:#0A9E8C; --btnshadow:rgba(40,40,80,.18);
 }
-
-input,
-button,
-select,
-textarea,
-canvas{
-  max-width:100%;
-  display:block;
-}
-
-html,
-body{
-  height:100%;
-}
-
-html{
-  -webkit-text-size-adjust:100%;
-  text-size-adjust:100%;
-}
-
-*{
-  -webkit-tap-highlight-color:transparent;
-}
-
-body{
-
-  font-family:
-    -apple-system,
-    system-ui,
-    Segoe UI,
-    Roboto,
-    Arial,
-    sans-serif;
-
-  background:var(--bg);
-
-  color:var(--text);
-
-  margin:0;
-
-  padding-top:60px;
-
-  padding-bottom:30px;
-}
-
-
-@supports(padding:env(safe-area-inset-top)){
-
-  body{
-
-    padding-left:
-      max(0px,env(safe-area-inset-left));
-
-    padding-right:
-      max(0px,env(safe-area-inset-right));
-
-  }
-
-}
-
-
-/* =====================================================
-   THANH TAB
-   ===================================================== */
-
-.tab-bar{
-
-  position:fixed;
-
-  top:0;
-
-  left:0;
-
-  right:0;
-
-  height:60px;
-
-  background:#e5e5ea;
-
-  border-bottom:1px solid #d1d1d6;
-
-  display:flex;
-
-  align-items:center;
-
-  z-index:99;
-
-  padding-top:
-    env(safe-area-inset-top,0px);
-
-}
-
-
-.tab-divider{
-
-  width:1px;
-
-  height:28px;
-
-  background-color:#c7c7cc;
-
-}
-
-
-.tab-item{
-
-  flex:1;
-
-  height:100%;
-
-  text-align:center;
-
-  color:var(--muted);
-
-  font-size:11px;
-
-  cursor:pointer;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:2px;
-
-  background:#e5e5ea;
-
-  opacity:.7;
-
-  transition:
-    background .2s ease,
-    opacity .2s ease,
-    color .2s ease;
-
-  user-select:none;
-
-}
-
-
-.tab-item.active{
-
-  background:#ffffff;
-
-  color:var(--primary);
-
-  font-weight:600;
-
-  opacity:1;
-
-}
-
-
-.tab-item .icon{
-
-  font-size:18px;
-
-}
-
-
-/* =====================================================
-   CONTAINER
-   ===================================================== */
-
-.container{
-
-  max-width:var(--container-max);
-
-  margin:0 auto;
-
-  padding:0 16px;
-
-}
-
-
-/* =====================================================
-   TAB CONTENT
-   ===================================================== */
-
-.tab-content{
-
-  display:none;
-
-}
-
-
-.tab-content.active{
-
-  display:block;
-
-}
-
-
-/* =====================================================
-   CARD
-   ===================================================== */
-
-.card{
-
-  background:var(--card);
-
-  padding:var(--pad);
-
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-
-  margin-bottom:var(--gap);
-
-  overflow:hidden;
-
-}
-
-
-h1,
-h2{
-
-  margin:0 0 10px;
-
-  line-height:1.25;
-
-}
-
-
-h1{
-
-  font-size:20px;
-
-  text-align:center;
-
-  margin-bottom:16px;
-
-}
-
-
-h2{
-
-  font-size:16px;
-
-}
-
-
-label{
-
-  font-size:12px;
-
-  color:var(--muted);
-
-  display:block;
-
-  margin-bottom:4px;
-
-}
-
-
-input,
-button{
-
-  width:100%;
-
-  min-height:44px;
-
-  font-size:16px;
-
-  border-radius:10px;
-
-}
-
-
-input{
-
-  padding:10px 12px;
-
-  margin:6px 0 10px;
-
-  border:1px solid #e3e3e8;
-
-  background:#fafafa;
-
-  outline:none;
-
-  transition:
-    border-color .15s,
-    background .15s,
-    box-shadow .15s;
-
-}
-
-
-input:focus{
-
-  border-color:var(--primary);
-
-  background:#fff;
-
-  box-shadow:
-    0 0 0 3px rgba(0,122,255,.12);
-
-}
-
-
-button{
-
-  padding:10px 12px;
-
-  margin-top:6px;
-
-  border:none;
-
-  font-size:13px;
-
-  cursor:pointer;
-
-  transition:
-    transform .05s ease,
-    filter .15s ease,
-    background .15s ease;
-
-}
-
-
-button:active{
-
-  transform:translateY(1px);
-
-}
-
-
-.addBtn{
-
-  background:var(--primary);
-
-  color:#fff;
-
-}
-
-
-.addBtn:hover{
-
-  filter:brightness(1.05);
-
-}
-
-
-.editBtn{
-
-  background:var(--warn);
-
-  color:#fff;
-
-  width:auto;
-
-  display:inline-block;
-
-  margin-right:6px;
-
-}
-
-
-.deleteBtn{
-
-  background:var(--danger);
-
-  color:#fff;
-
-  width:auto;
-
-  display:inline-block;
-
-}
-
-
-.item{
-
-  padding:8px 0;
-
-  border-bottom:1px solid #efeff4;
-
-  font-size:13.5px;
-
-}
-
-
-.item:last-child{
-
-  border-bottom:none;
-
-}
-
-
-#assetChart{
-
-  min-height:220px;
-
-  width:100%;
-
-  display:block;
-
-}
-
-/* Bảng chi tiết thống kê */
-.stats-table-wrap{
-  margin-top:14px;
-  border:1px solid #ececf1;
-  border-radius:14px;
-  overflow:hidden;
-  background:#fff;
-}
-
-.stats-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-.stats-table th{
-  padding:10px 9px;
-  background:#f7f7fa;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:.2px;
-}
-
-.stats-table td{
-  padding:12px 9px;
-  border-top:1px solid #f0f0f4;
-  vertical-align:middle;
-}
-
-.stats-table th:not(:first-child),
-.stats-table td:not(:first-child){
-  text-align:right;
-}
-
-.stats-rank{
-  width:28px;
-  color:#999;
-  font-size:11px;
-}
-
-.stats-name{
-  text-align:left !important;
-  font-weight:600;
-}
-
-.stats-value{
-  font-weight:700;
-  white-space:nowrap;
-}
-
-.stats-percent{
-  font-weight:700;
-  white-space:nowrap;
-}
-
-.stats-empty{
-  padding:14px !important;
-  text-align:center !important;
-  color:var(--muted);
-}
-
-
-.total{
-
-  font-size:16px;
-
-  font-weight:600;
-
-  text-align:center;
-
-  background:
-    linear-gradient(
-      180deg,
-      #fff,
-      #fbfbfd
-    );
-
-  border:1px solid #eee;
-
-}
-
-
-.total.sticky{
-
-  position:sticky;
-
-  bottom:
-    calc(
-      8px +
-      env(
-        safe-area-inset-bottom,
-        0px
-      )
-    );
-
-  z-index:5;
-
-}
-
-
-/* =====================================================
-   GRID
-   ===================================================== */
-
-.grid-2{
-
-  display:grid;
-
-  gap:var(--gap);
-
-}
-
-
-@media (min-width:880px){
-
-  .grid-2{
-
-    grid-template-columns:1fr 1fr;
-
-  }
-
-}
-
-
-/* =====================================================
-   MÀN HÌNH KHÓA
-   ===================================================== */
-
-#lockScreen{
-
-  position:fixed;
-
-  inset:0;
-
-  width:100%;
-
-  height:100%;
-
-  background:var(--bg);
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  flex-direction:column;
-
-  padding:24px;
-
-  z-index:9999;
-
-}
-
-
-@supports(padding:env(safe-area-inset-top)){
-
-  #lockScreen{
-
-    padding-top:
-      max(
-        24px,
-        env(safe-area-inset-top)
-      );
-
-    padding-bottom:
-      max(
-        24px,
-        env(safe-area-inset-bottom)
-      );
-
-  }
-
-}
-
-
-#lockScreen .lock-card{
-
-  width:min(480px,92%);
-
-  background:var(--card);
-
-  padding:20px;
-
-  border-radius:16px;
-
-  box-shadow:var(--shadow);
-
-  text-align:center;
-
-}
-
-
-#pinInput{
-
-  text-align:center;
-
-  letter-spacing:2px;
-
-  font-weight:600;
-
-}
-
-
-#pinInput::placeholder{
-
-  font-size:80%;
-
-}
-
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media(max-width:480px){
-
-  body{
-
-    font-size:15px;
-
-  }
-
-
-  .container{
-
-    margin:0 auto 28px;
-
-  }
-
-
-  .card{
-
-    padding:12px;
-
-  }
-
-
-  .tab-item{
-
-    font-size:10px;
-
-  }
-
-
-  .tab-item .icon{
-
-    font-size:17px;
-
-  }
-
-}
-
-
-/* ===== MODAL SỬA RIÊNG TỪNG HẠNG MỤC ===== */
-.edit-modal-backdrop{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45);backdrop-filter:blur(5px)}
-.edit-modal-backdrop.show{display:flex}
-.edit-modal{width:min(520px,100%);max-height:min(90vh,760px);overflow:auto;background:var(--card,#fff);color:var(--text,#111);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:20px}
-.edit-modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.edit-modal-title{margin:0;font-size:20px;font-weight:800}
-.edit-modal-close{width:36px;height:36px;border:0;border-radius:50%;background:rgba(127,127,127,.12);color:inherit;font-size:24px;line-height:1;cursor:pointer}
-.edit-modal-grid{display:grid;gap:14px}.edit-field{display:grid;gap:7px}
-.edit-field label{font-size:13px;font-weight:700;color:var(--muted,#666)}
-.edit-field input,.edit-field textarea{width:100%;box-sizing:border-box;border:1px solid rgba(127,127,127,.25);border-radius:12px;padding:12px 13px;font:inherit;background:rgba(127,127,127,.07);color:inherit;outline:none}
-.edit-field textarea{min-height:88px;resize:vertical}
-.edit-field input:focus,.edit-field textarea:focus{border-color:var(--primary,#007AFF);box-shadow:0 0 0 3px rgba(0,122,255,.12)}
-.edit-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-.edit-modal-actions button{border:0;border-radius:12px;padding:11px 17px;font:inherit;font-weight:700;cursor:pointer}
-.edit-cancel{background:rgba(127,127,127,.14);color:inherit}.edit-save{background:var(--primary,#007AFF);color:#fff}
-@media(max-width:480px){.edit-modal{padding:16px;border-radius:18px}.edit-modal-actions{position:sticky;bottom:0;background:var(--card,#fff);padding-top:10px}}
-
+:root[data-accent="ocean"]{--violet:#2563EB;--pink:#0EA5E9;--accent3:#14B8A6;--a1rgb:37,99,235;--a2rgb:14,165,233}
+:root[data-accent="forest"]{--violet:#047857;--pink:#16A34A;--accent3:#65A30D;--a1rgb:4,120,87;--a2rgb:22,163,74}
+:root[data-accent="sunset"]{--violet:#E11D48;--pink:#F97316;--accent3:#F59E0B;--a1rgb:225,29,72;--a2rgb:249,115,22}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px}
+body{background:
+  radial-gradient(520px 520px at 90% -80px,var(--glow1),transparent 70%),
+  radial-gradient(520px 520px at -120px 40%,var(--glow2),transparent 70%),
+  radial-gradient(480px 480px at 100% 100%,var(--glow3),transparent 70%),
+  var(--bg);background-attachment:fixed;transition:background-color .3s}
+#app{display:none;max-width:520px;margin:0 auto;min-height:100vh;
+  padding:calc(env(safe-area-inset-top) + 92px) 18px calc(24px + env(safe-area-inset-bottom))}
+h1{margin:0 0 2px;font-size:32px;font-weight:800;letter-spacing:-.6px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+.tab{display:none}
+.tab.active{display:block;animation:fade .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+svg{display:block}
+
+/* khóa */
+#lock{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(520px 520px at 90% -80px,var(--glow1),transparent 70%),
+  radial-gradient(480px 480px at 0% 100%,var(--glow3),transparent 70%),var(--bg)}
+.lockbox{width:100%;max-width:360px;text-align:center}
+.lockic{width:72px;height:72px;border-radius:24px;margin:0 auto 18px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--violet),var(--pink));box-shadow:0 14px 30px rgba(var(--a1rgb),.4)}
+.lockic svg{width:34px;height:34px}
+.lockbox h2{margin:0 0 4px;font-size:24px;font-weight:800}
+.lockbox .by{color:var(--muted);font-size:13px;margin-bottom:22px}
+.lockbox .field{text-align:left;margin-bottom:12px}
+.lockbox .field input{text-align:center;letter-spacing:6px}
+.lockbox .field input::placeholder{letter-spacing:0}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* thẻ tổng */
+.hero{position:relative;overflow:hidden;border-radius:30px;padding:22px;color:#fff;
+  background:linear-gradient(135deg,var(--violet) 0%,var(--pink) 55%,var(--accent3) 100%);box-shadow:0 18px 40px rgba(var(--a1rgb),.4)}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero:before{width:150px;height:150px;right:-40px;top:-45px}
+.hero:after{width:120px;height:120px;right:50px;bottom:-70px;background:rgba(255,255,255,.08)}
+.hero>*{position:relative;z-index:1}
+.hero .lbl{font-size:14px;opacity:.85;display:flex;align-items:center;gap:6px}
+.hero .big{font-size:clamp(24px,7.5vw,32px);font-weight:800;letter-spacing:-.5px;margin:4px 0 0;white-space:nowrap}
+.hero.total{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom));z-index:5;margin-top:4px;padding:16px 20px;border-radius:26px;text-align:center}
+.hero.total{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:12px 18px;border-radius:22px}
+.hero.total .lbl{justify-content:flex-start;font-size:13.5px;white-space:nowrap}
+.hero.total .big{margin:0;font-size:clamp(16px,5vw,20px);text-align:right}
+
+/* mục */
+#sections{margin-top:14px}
+.zone{position:relative;overflow:hidden;border-radius:30px;padding:18px 14px 14px;margin-bottom:20px;
+  border:1px solid rgba(var(--zrgb),.35);background:linear-gradient(180deg,rgba(var(--zrgb),.16),rgba(var(--zrgb),.05) 60%,rgba(var(--zrgb),.03))}
+.zone:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--zg)}
+.zone.gold{--zrgb:var(--rgb-gold);--zg:var(--g-gold)}
+.zone.hard{--zrgb:var(--rgb-hard);--zg:var(--g-hard)}
+.zone.online{--zrgb:var(--rgb-online);--zg:var(--g-online)}
+.zone .item:last-child,.zone .empty{margin-bottom:0}
+.sec{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+.sec .ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;flex:none;color:#fff}
+.sec .ic svg{width:21px;height:21px}
+.sec .tt{flex:1;min-width:0}
+.sec .tt b{display:block;font-size:17px}
+.sec .tt small{color:var(--muted);font-size:12.5px}
+.add{border:0;color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:16px;font-family:inherit;cursor:pointer;
+  box-shadow:0 6px 16px var(--btnshadow);transition:transform .15s}
+.add:active{transform:scale(.95)}
+.gold .ic,.gold .add{background:var(--g-gold)}
+.hard .ic,.hard .add{background:var(--g-hard)}
+.online .ic,.online .add{background:var(--g-online)}
+.item{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px;margin-bottom:10px}
+.item .r1{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.item .r2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.item .r2 .d{margin:0;flex:1;min-width:0}
+.item .t{flex:1;min-width:0;font-weight:700;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .d{color:var(--muted);font-size:13px;margin-top:3px;word-break:break-word}
+.item .d.n{white-space:pre-line;font-style:italic;margin-top:6px}
+.item .v{flex:none;text-align:right;font-weight:800;font-size:17px;white-space:nowrap}
+.item .v.dim{color:var(--muted);font-size:13px;font-weight:600}
+.gold .v{color:var(--c-gold)} .hard .v{color:var(--c-hard)} .online .v{color:var(--c-online)}
+.btns{flex:none;display:grid;grid-template-columns:60px 60px;gap:6px;align-items:center}
+.pill{border:0;border-radius:11px;width:60px;height:30px;margin:0;padding:0;font-size:12.5px;line-height:1;font-weight:700;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;vertical-align:middle;-webkit-appearance:none;appearance:none}
+.pill svg{width:13px;height:13px}
+.pill.e{background:rgba(91,155,255,.14);color:var(--blue)}
+.pill.d{background:rgba(255,92,122,.14);color:var(--red)}
+.empty{border:1px dashed var(--line);border-radius:22px;padding:22px;text-align:center;color:var(--muted);font-size:14px;background:var(--soft)}
+
+/* thống kê */
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:20px;margin-bottom:16px}
+.donut-wrap{position:relative;width:min(270px,100%);aspect-ratio:1;margin:6px auto}
+.donut-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut-wrap circle{fill:none;stroke-width:26;transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1)}
+.donut-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-mid small{color:var(--muted);font-size:13px}
+.donut-mid b{font-size:30px;font-weight:800}
+.donut-mid span{color:var(--muted);font-size:12px}
+.trow{display:flex;align-items:center;gap:8px;font-size:14px}
+.trow.h{color:var(--muted);font-size:12px}
+.c1{flex:5;display:flex;align-items:center;gap:8px;font-weight:600;min-width:0}
+.c2{flex:5;text-align:right;font-weight:600;white-space:nowrap}
+.c3{width:68px;text-align:right}
+.h .c1,.h .c2{font-weight:400}
+.dot{width:12px;height:12px;border-radius:4px;flex:none}
+.chip{display:inline-block;padding:3px 9px;border-radius:10px;font-size:12.5px;font-weight:700;background:var(--soft)}
+.rowx{padding:10px 0}
+.bar{height:6px;border-radius:4px;background:var(--track);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:4px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.sumrow{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;font-weight:800}
+
+/* cài đặt / form */
+.card h3{margin:0 0 14px;font-size:17px;display:flex;align-items:center;gap:12px}
+.card h3 .ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.card h3 .ic svg{width:21px;height:21px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.inp{position:relative}
+.field input,.field textarea,.field select{width:100%;background:var(--card2);color:var(--text);border:1px solid var(--line);
+  border-radius:16px;padding:15px 16px;font-size:17px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(var(--a2rgb),.18)}
+.field input[type=date]{display:block;min-height:54px;text-align:left}
+.field input[type=date]::-webkit-date-and-time-value{text-align:left}
+.inp .suf{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:600;font-size:14px;pointer-events:none}
+.inp input.has-suf{padding-right:84px}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 14px;line-height:1.45}
+.btn{width:100%;border:0;border-radius:16px;padding:15px;font-size:16px;font-weight:700;font-family:inherit;color:#fff;cursor:pointer;
+  box-shadow:0 8px 20px var(--btnshadow);transition:transform .15s}
+.btn:active{transform:scale(.98)}
+.btn.main{background:linear-gradient(135deg,var(--violet),var(--pink))}
+.btn.ghost{background:var(--soft);border:1px solid var(--line);box-shadow:none;color:var(--text);font-weight:600}
+.btn+.btn{margin-top:10px}
+.seg{display:flex;gap:6px;padding:5px;border-radius:20px;background:var(--card2);border:1px solid var(--line)}
+.seg button{flex:1;border:0;background:none;color:var(--muted);font-family:inherit;font-size:15px;font-weight:700;padding:12px;border-radius:15px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s}
+.seg button svg{width:18px;height:18px}
+.seg button.on{color:#fff;background:linear-gradient(135deg,var(--violet),var(--pink));box-shadow:0 6px 14px rgba(var(--a1rgb),.4)}
+
+/* màu chủ đề */
+.swatches{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sw{display:flex;align-items:center;gap:10px;border:2px solid var(--line);background:var(--card2);color:var(--text);border-radius:18px;
+  padding:10px 12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s}
+.sw i{width:32px;height:32px;border-radius:50%;flex:none;box-shadow:0 4px 10px var(--btnshadow)}
+.sw.on{border-color:var(--pink);box-shadow:0 0 0 3px rgba(var(--a2rgb),.18)}
+
+/* điều hướng */
+nav{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top));
+  width:min(calc(100% - 32px),488px);height:62px;border-radius:31px;display:none;justify-content:space-evenly;align-items:center;
+  background:var(--navbg);border:1px solid var(--line);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);z-index:10;box-shadow:0 10px 30px var(--navshadow)}
+nav.show{display:flex}
+nav button{border:0;background:none;color:var(--muted);display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:24px;
+  font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.2,.8,.2,1)}
+nav button svg{width:22px;height:22px;flex:none}
+nav button span{display:none}
+nav button.active{color:#fff;padding:11px 18px;background:linear-gradient(135deg,var(--violet),var(--pink));box-shadow:0 8px 18px rgba(var(--a1rgb),.45)}
+nav button.active span{display:inline}
+
+/* sheet */
+.overlay{position:fixed;inset:0;background:var(--scrim);display:none;align-items:flex-end;justify-content:center;z-index:30;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.overlay.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:520px;max-height:92%;overflow-y:auto;border-radius:32px 32px 0 0;
+  border:1px solid var(--line);border-bottom:0;padding:12px 20px calc(20px + env(safe-area-inset-bottom));animation:up .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
+.sheet h2{margin:0 0 20px;font-size:20px;font-weight:800;display:flex;align-items:center;gap:12px}
+.sheet h2 .ic{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.sheet h2 .ic svg{width:22px;height:22px}
+.err{color:var(--red);font-size:13.5px;margin:0 0 12px}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--toast);color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:70;max-width:85%;text-align:center;border:1px solid var(--line)}
+#toast.show{opacity:1}
+.confirm{position:fixed;inset:0;background:var(--scrim);display:none;align-items:center;justify-content:center;z-index:65;padding:24px}
+.confirm.show{display:flex}
+.confirm .box{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;width:100%;max-width:360px;animation:fade .25s}
+.confirm h4{margin:0 0 8px;font-size:18px}
+.confirm p{margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.45;white-space:pre-line}
+.confirm .acts{display:flex;gap:10px;justify-content:flex-end}
+.confirm .acts button{border:0;border-radius:14px;padding:10px 18px;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;background:var(--soft);color:var(--muted)}
+.confirm .acts button.ok{background:var(--blue);color:#fff}
+.confirm .acts button.ok.danger{background:var(--red)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
 </head>
-
-
 <body>
 
-
-<!-- =====================================================
-     MÀN HÌNH KHÓA
-     ===================================================== -->
-
-<div
-  id="lockScreen"
-  aria-live="polite">
-
-  <div class="lock-card">
-
-    <h3
-      style="
-        margin:0 0 4px;
-        color:#2563eb;
-      ">
-
-      Author : LWD
-
-    </h3>
-
-
-    <h2
-      style="
-        margin:0 0 12px;
-      ">
-
-      🔐 Nhập mật khẩu
-
-    </h2>
-
-
-    <input
-      type="password"
-      id="pinInput"
-      inputmode="numeric"
-      autocomplete="one-time-code"
-      placeholder="Nhập mật khẩu để mở ứng dụng">
-
-
-    <button
-      class="addBtn"
-      onclick="checkPIN()">
-
-      Mở
-
-    </button>
-
-
-    <p
-      id="pinError"
-      style="
-        color:#e11d48;
-        margin:8px 0 0;
-      ">
-    </p>
-
+<div id="lock">
+  <div class="lockbox" id="lockbox">
+    <div class="lockic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+    <h2>Quản lý tài sản</h2>
+    <div class="by">Author : LWD</div>
+    <div class="field"><input type="password" id="pinInput" inputmode="numeric" autocomplete="one-time-code" placeholder="Nhập mật khẩu để mở ứng dụng"></div>
+    <div class="err" id="pinError"></div>
+    <button class="btn main" id="pinBtn">Mở</button>
   </div>
-
 </div>
 
+<div id="app">
+  <section class="tab active" id="tab-assets">
+    <h1>Quản Lý Tài Sản</h1>
+    <div id="sections"></div>
+    <div class="hero total">
+      <div class="lbl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Tổng tài sản</div>
+      <div class="big" id="grand">0 ₫</div>
+    </div>
+  </section>
 
+  <section class="tab" id="tab-stats">
+    <h1>Tỉ lệ tài sản</h1>
+    <div class="card" id="donutCard"></div>
+    <div class="card">
+      <div class="trow h"><div class="c1">Loại tài sản</div><div class="c2">Giá trị</div><div class="c3">Tỉ lệ</div></div>
+      <div id="stats-rows"></div>
+      <div class="trow sumrow" id="stats-sum"></div>
+    </div>
+  </section>
 
-<!-- =====================================================
-     APP
-     ===================================================== -->
-
-<div
-  id="app"
-  style="display:none;">
-
-
-  <!-- THANH TAB -->
-
-  <div class="tab-bar">
-
-
-    <div
-      class="tab-item active"
-      onclick="switchTab('assets',this)">
-
-      <span class="icon">
-        💰
-      </span>
-
-      <span>
-        Tài sản
-      </span>
-
+  <section class="tab" id="tab-settings">
+    <h1>Cài đặt</h1>
+    <div class="card">
+      <h3><span class="ic" style="background:linear-gradient(135deg,var(--violet),var(--pink))" id="icTheme"></span>Giao diện</h3>
+      <div class="seg" id="themeSeg">
+        <button data-theme="dark" id="thDark"></button>
+        <button data-theme="light" id="thLight"></button>
+      </div>
     </div>
 
-
-    <div class="tab-divider"></div>
-
-
-    <div
-      class="tab-item"
-      onclick="switchTab('stats',this)">
-
-      <span class="icon">
-        📊
-      </span>
-
-      <span>
-        Thống kê
-      </span>
-
+    <div class="card">
+      <h3><span class="ic" style="background:linear-gradient(135deg,var(--violet),var(--pink))" id="icAccent"></span>Màu chủ đề</h3>
+      <div class="swatches" id="accentSeg"></div>
     </div>
 
-
-    <div class="tab-divider"></div>
-
-
-    <div
-      class="tab-item"
-      onclick="switchTab('settings',this)">
-
-      <span class="icon">
-        ⚙️
-      </span>
-
-      <span>
-        Cài đặt
-      </span>
-
+    <div class="card">
+      <h3><span class="ic" style="background:var(--g-gold)" id="icGoldSet"></span>Đơn giá vàng</h3>
+      <div class="field">
+        <label for="goldPrice">Giá 1 chỉ vàng</label>
+        <div class="inp"><input id="goldPrice" class="has-suf" type="text" inputmode="numeric" autocomplete="off" placeholder="vd: 7.500.000"><span class="suf">VND / chỉ</span></div>
+      </div>
+      <div class="hint" style="margin:-4px 0 0">Giá trị vàng = số chỉ × đơn giá. Tự động lưu khi bạn nhập.</div>
     </div>
 
-
-  </div>
-
-
-
-  <div class="container">
-
-
-    <!-- =================================================
-         TAB 1: TÀI SẢN
-         ================================================= -->
-
-    <div
-      id="tab-assets"
-      class="tab-content active"
-      style="padding-top:12px;">
-
-
-      <h1>
-        Quản lý tài sản
-      </h1>
-
-
-      <div class="grid-2">
-
-
-        <!-- VÀNG -->
-
-        <div class="card">
-
-          <h2>
-
-            🥇 Vàng
-
-            <span
-              style="
-                font-size:12px;
-                color:var(--muted);
-                font-weight:normal;
-              ">
-
-              (đơn vị: chỉ)
-
-            </span>
-
-          </h2>
-
-
-          <input
-            type="text"
-            id="goldName"
-            placeholder="Tên cửa hàng">
-
-
-          <input
-            type="number"
-            step="0.01"
-            id="goldQty"
-            inputmode="decimal"
-            placeholder="Số lượng (chỉ)">
-
-
-          <input
-            type="text"
-            id="goldNote"
-            placeholder="Ghi chú">
-
-
-          <button
-            class="addBtn"
-            onclick="addGold()">
-
-            Thêm vàng
-
-          </button>
-
-
-          <div id="goldList"></div>
-
-        </div>
-
-
-
-        <!-- SỔ CỨNG -->
-
-        <div class="card">
-
-          <h2>
-            🏦 Sổ tiết kiệm cứng
-          </h2>
-
-
-          <input
-            type="text"
-            id="bankName"
-            placeholder="Tên ngân hàng">
-
-
-          <input
-            type="text"
-            id="bankAmount"
-            inputmode="numeric"
-            pattern="[0-9.]*"
-            placeholder="Số tiền (VND)">
-
-
-          <label for="bankDate">
-
-            Ngày mở sổ
-
-          </label>
-
-
-          <input
-            type="date"
-            id="bankDate">
-
-
-          <button
-            class="addBtn"
-            onclick="addBank()">
-
-            Thêm sổ tiết kiệm
-
-          </button>
-
-
-          <div id="bankList"></div>
-
-        </div>
-
-
-      </div>
-
-
-
-      <!-- SỔ ONLINE -->
-
-      <div class="card">
-
-        <h2>
-          💳 Sổ tiết kiệm online
-        </h2>
-
-
-        <input
-          type="text"
-          id="onlineAmountInput"
-          inputmode="numeric"
-          pattern="[0-9.]*"
-          placeholder="Số tiền (VND)">
-
-
-        <label for="onlineDate">
-
-          Ngày mở sổ
-
-        </label>
-
-
-        <input
-          type="date"
-          id="onlineDate">
-
-
-        <button
-          class="addBtn"
-          onclick="addOnline()">
-
-          Thêm sổ online
-
-        </button>
-
-
-        <div id="onlineList"></div>
-
-      </div>
-
-
-
-      <!-- TỔNG -->
-
-      <div
-        class="card total sticky"
-        id="grandTotal">
-
-        Tổng tài sản: 0 VND
-
-      </div>
-
-
-    </div>
-
-
-
-    <!-- =================================================
-         TAB 2: THỐNG KÊ
-         ================================================= -->
-
-    <div
-      id="tab-stats"
-      class="tab-content"
-      style="padding-top:12px;">
-
-
-      <h1>
-        Thống kê tài sản
-      </h1>
-
-
-      <div class="card">
-
-        <h2>
-          📊 Tỷ lệ tài sản
-        </h2>
-
-
-        <canvas
-          id="assetChart"
-          aria-label="Biểu đồ tỷ lệ tài sản"
-          role="img">
-        </canvas>
-
-
-        <div
-          id="assetSummary"
-          class="stats-table-wrap">
-        </div>
-
-
-      </div>
-
-
-
-      <div
-        class="card"
-        style="
-          text-align:center;
-          font-size:14px;
-        ">
-
-        <div
-          style="
-            color:var(--muted);
-            font-size:12px;
-          ">
-
-          Tổng giá trị tài sản
-
-        </div>
-
-
-        <div
-          id="statsTotal"
-          style="
-            font-size:22px;
-            font-weight:700;
-            margin-top:5px;
-          ">
-
-          0 VND
-
-        </div>
-
-      </div>
-
-
-    </div>
-
-
-
-    <!-- =================================================
-         TAB 3: CÀI ĐẶT
-         ================================================= -->
-
-    <div
-      id="tab-settings"
-      class="tab-content"
-      style="padding-top:12px;">
-
-      <div class="card">
-
-        <h2>
-          🥇 Đơn giá vàng
-        </h2>
-
-
-        <label for="goldPrice">
-
-          Đơn giá vàng (VND/chỉ)
-
-        </label>
-
-
-        <input
-          type="text"
-          id="goldPrice"
-          inputmode="numeric"
-          pattern="[0-9.]*"
-          placeholder="vd: 7.500.000">
-
-
-        <div
-          style="
-            font-size:12px;
-            color:var(--muted);
-            margin-top:0;
-          ">
-
-          Đơn giá này được sử dụng để
-          tính giá trị số vàng trong Tab Tài sản.
-
-        </div>
-
-
-      </div>
-
-
-
-      <!-- TỰ ĐỘNG KHÓA -->
-
-      <div class="card">
-
-        <h2>
-          🔒 Tự động khóa ứng dụng
-        </h2>
-
-        <label for="autoLockSelect">
-          Tự động khóa sau khi không thao tác
-        </label>
-
-        <select
-          id="autoLockSelect"
-          style="
-            width:100%;
-            box-sizing:border-box;
-            border:1px solid rgba(127,127,127,.25);
-            border-radius:12px;
-            padding:12px 13px;
-            font:inherit;
-            background:rgba(127,127,127,.07);
-            color:inherit;
-            outline:none;
-          ">
-
+    <div class="card">
+      <h3><span class="ic" style="background:var(--g-hard)" id="icLock"></span>Tự động khóa khi không thao tác</h3>
+      <div class="field" style="margin-bottom:0">
+        <select id="autoLockSelect">
           <option value="0">Tắt tự động khóa</option>
-          <option value="1">1 phút</option>
-          <option value="3">3 phút</option>
-          <option value="5">5 phút</option>
-          <option value="10">10 phút</option>
-          <option value="30">30 phút</option>
-
+          <option value="1">1 phút</option><option value="3">3 phút</option><option value="5">5 phút</option>
+          <option value="10">10 phút</option><option value="30">30 phút</option>
         </select>
-
-        <div
-          style="
-            font-size:12px;
-            color:var(--muted);
-            margin-top:8px;
-          ">
-
-          Khi hết thời gian không có thao tác,
-          ứng dụng sẽ tự khóa và yêu cầu nhập lại mật khẩu.
-
-        </div>
-
       </div>
-
-
-      <!-- SAO LƯU -->
-
-      <div class="card">
-
-        <h2>
-          🗂️ Sao lưu dữ liệu
-        </h2>
-
-
-        <button
-          class="addBtn"
-          onclick="exportToJSON()">
-
-          📤 Xuất file backup
-
-        </button>
-
-
-        <div
-          style="
-            margin-top:8px;
-            font-size:12px;
-            color:var(--muted);
-          ">
-
-          Xuất toàn bộ dữ liệu tài sản
-          thành file JSON.
-
-        </div>
-
-      </div>
-
-
-
-      <!-- PHỤC HỒI -->
-
-      <div class="card">
-
-        <h2>
-          📥 Phục hồi dữ liệu
-        </h2>
-
-
-        <label for="restoreFile">
-
-          Chọn file backup (.json)
-
-        </label>
-
-
-        <input
-          type="file"
-          id="restoreFile"
-          accept=".json">
-
-
-        <button
-          class="addBtn"
-          style="
-            background:var(--success);
-          "
-          onclick="importFromFile()">
-
-          📥 Load dữ liệu
-
-        </button>
-
-
-        <div
-          style="
-            margin-top:8px;
-            font-size:12px;
-            color:var(--muted);
-          ">
-
-          ⚠️ Khi phục hồi,
-          dữ liệu hiện tại sẽ bị ghi đè.
-
-        </div>
-
-      </div>
-
-
+      <div class="hint" style="margin:10px 0 0">Hết thời gian không thao tác, ứng dụng sẽ khóa và yêu cầu nhập lại mật khẩu.</div>
     </div>
 
+    <div class="card">
+      <h3><span class="ic" style="background:var(--g-online)" id="icBackup"></span>Sao lưu dữ liệu</h3>
+      <button class="btn" style="background:var(--g-online)" id="exportBtn">Xuất file sao lưu</button>
+      <button class="btn ghost" id="importBtn">Phục hồi từ file sao lưu</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <div class="hint" style="margin:14px 0 0">Phục hồi sẽ ghi đè toàn bộ dữ liệu hiện tại. Hãy xuất file định kỳ và lưu ở nơi an toàn.</div>
+    </div>
 
-  </div>
-
+    <button class="btn ghost" id="lockNow" style="margin-bottom:8px">Khóa ứng dụng ngay</button>
+  </section>
 </div>
 
+<nav id="nav"></nav>
 
-
-
-<!-- ===== MODAL SỬA VÀNG ===== -->
-<div id="goldEditModal" class="edit-modal-backdrop" aria-hidden="true">
-  <div class="edit-modal" role="dialog" aria-modal="true">
-    <div class="edit-modal-header">
-      <h2 class="edit-modal-title">Chỉnh sửa vàng</h2>
-      <button type="button" class="edit-modal-close" id="goldEditClose">×</button>
-    </div>
-    <form id="goldEditForm">
-      <div class="edit-modal-grid">
-        <div class="edit-field">
-          <label for="goldEditName">Tên cửa hàng</label>
-          <input id="goldEditName" type="text" autocomplete="off">
-        </div>
-        <div class="edit-field">
-          <label for="goldEditQty">Số lượng</label>
-          <input id="goldEditQty" type="text" inputmode="decimal">
-        </div>
-        <div class="edit-field">
-          <label for="goldEditNote">Ghi chú</label>
-          <textarea id="goldEditNote"></textarea>
-        </div>
-      </div>
-      <div class="edit-modal-actions">
-        <button type="button" class="edit-cancel" id="goldEditCancel">Hủy</button>
-        <button type="submit" class="edit-save">Lưu thay đổi</button>
-      </div>
-    </form>
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="sheetTitle"></h2>
+    <div id="formFields"></div>
+    <div class="err" id="formErr"></div>
+    <button class="btn" id="formSave">Lưu thay đổi</button>
+    <button class="btn ghost" id="formCancel">Hủy</button>
   </div>
 </div>
 
-<!-- ===== MODAL SỬA SỔ TIẾT KIỆM CỨNG ===== -->
-<div id="bankEditModal" class="edit-modal-backdrop" aria-hidden="true">
-  <div class="edit-modal" role="dialog" aria-modal="true">
-    <div class="edit-modal-header">
-      <h2 class="edit-modal-title">Chỉnh sửa sổ tiết kiệm cứng</h2>
-      <button type="button" class="edit-modal-close" id="bankEditClose">×</button>
-    </div>
-    <form id="bankEditForm">
-      <div class="edit-modal-grid">
-        <div class="edit-field">
-          <label for="bankEditName">Tên ngân hàng</label>
-          <input id="bankEditName" type="text" autocomplete="off">
-        </div>
-        <div class="edit-field">
-          <label for="bankEditAmount">Số tiền</label>
-          <input id="bankEditAmount" type="text" inputmode="decimal">
-        </div>
-        <div class="edit-field">
-          <label for="bankEditDate">Ngày mở</label>
-          <input id="bankEditDate" type="date">
-        </div>
-      </div>
-      <div class="edit-modal-actions">
-        <button type="button" class="edit-cancel" id="bankEditCancel">Hủy</button>
-        <button type="submit" class="edit-save">Lưu thay đổi</button>
-      </div>
-    </form>
-  </div>
+<div class="confirm" id="confirm">
+  <div class="box"><h4 id="cTitle"></h4><p id="cBody"></p>
+    <div class="acts"><button id="cNo">Hủy</button><button class="ok" id="cYes">Đồng ý</button></div></div>
 </div>
-
-<!-- ===== MODAL SỬA SỔ TIẾT KIỆM ONLINE ===== -->
-<div id="onlineEditModal" class="edit-modal-backdrop" aria-hidden="true">
-  <div class="edit-modal" role="dialog" aria-modal="true">
-    <div class="edit-modal-header">
-      <h2 class="edit-modal-title">Chỉnh sửa sổ tiết kiệm online</h2>
-      <button type="button" class="edit-modal-close" id="onlineEditClose">×</button>
-    </div>
-    <form id="onlineEditForm">
-      <div class="edit-modal-grid">
-        <div class="edit-field">
-          <label for="onlineEditAmount">Số tiền</label>
-          <input id="onlineEditAmount" type="text" inputmode="decimal">
-        </div>
-        <div class="edit-field">
-          <label for="onlineEditDate">Ngày mở</label>
-          <input id="onlineEditDate" type="date">
-        </div>
-      </div>
-      <div class="edit-modal-actions">
-        <button type="button" class="edit-cancel" id="onlineEditCancel">Hủy</button>
-        <button type="submit" class="edit-save">Lưu thay đổi</button>
-      </div>
-    </form>
-  </div>
-</div>
+<div id="toast"></div>
 
 <script>
-
-/* =====================================================
-   DOM
-   ===================================================== */
-
-const app =
-  document.getElementById('app');
-
-const lockScreen =
-  document.getElementById('lockScreen');
-
-const pinInput =
-  document.getElementById('pinInput');
-
-const pinError =
-  document.getElementById('pinError');
-
-
-const goldPrice =
-  document.getElementById('goldPrice');
-
-const goldName =
-  document.getElementById('goldName');
-
-const goldQty =
-  document.getElementById('goldQty');
-
-const goldNote =
-  document.getElementById('goldNote');
-
-const goldList =
-  document.getElementById('goldList');
-
-
-const bankName =
-  document.getElementById('bankName');
-
-const bankAmount =
-  document.getElementById('bankAmount');
-
-const bankDate =
-  document.getElementById('bankDate');
-
-const bankList =
-  document.getElementById('bankList');
-
-
-const onlineAmountInput =
-  document.getElementById('onlineAmountInput');
-
-const onlineDate =
-  document.getElementById('onlineDate');
-
-const onlineList =
-  document.getElementById('onlineList');
-
-
-const assetSummary =
-  document.getElementById('assetSummary');
-
-const grandTotal =
-  document.getElementById('grandTotal');
-
-const statsTotal =
-  document.getElementById('statsTotal');
-
-const restoreFile =
-  document.getElementById('restoreFile');
-
-const autoLockSelect =
-  document.getElementById('autoLockSelect');
-
-
-const assetCanvas =
-  document.getElementById('assetChart');
-
-
-/* =====================================================
-   DATA
-   ===================================================== */
-
-let golds = [];
-
-let banks = [];
-
-let onlines = [];
-
-let lockTimer;
-
-const AUTO_LOCK_STORAGE_KEY = "autoLockMinutes";
-const DEFAULT_AUTO_LOCK_MINUTES = 3;
-
-const FIXED_PIN = "981202";
-
-
-let _lastTotals = {
-
-  goldTotal:0,
-
-  bankTotal:0,
-
-  onlineTotal:0
-
+(function(){
+'use strict';
+var FIXED_PIN='981202', AUTO_KEY='autoLockMinutes', DEFAULT_LOCK=3;
+var KINDS=['gold','hard','online'];
+var LS={gold:'golds',hard:'banks',online:'onlines'};
+var NAMES={gold:'Vàng',hard:'Sổ tiết kiệm cứng',online:'Sổ tiết kiệm online'};
+var SHORT={gold:'Vàng',hard:'Sổ cứng',online:'Online'};
+var GRAD={gold:'var(--g-gold)',hard:'var(--g-hard)',online:'var(--g-online)'};
+var SOLID={gold:['#FFD54A','#FF9F1C'],hard:['#5B9BFF','#7B5CFF'],online:['#22E6A8','#12B5F0']};
+var COLOR={gold:'var(--c-gold)',hard:'var(--c-hard)',online:'var(--c-online)'};
+function S(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+var ICON={
+  gold:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10l1.6-4.5h4.8L16 10z" fill="currentColor" fill-opacity=".3"/><path d="M2.5 19l1.6-4.5h6L11.7 19z" fill="currentColor" fill-opacity=".3"/><path d="M12.3 19l1.6-4.5h6l1.6 4.5z" fill="currentColor" fill-opacity=".3"/></svg>',
+  hard:S('<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/>'),
+  online:S('<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>'),
+  edit:S('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
+  del:S('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>'),
+  wallet:S('<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h2"/><path d="M3 10V8a3 3 0 0 1 3-3h11"/>'),
+  pie:S('<path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>'),
+  cog:S('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'),
+  lock:S('<rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+  cloud:S('<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9z"/>'),
+  sun:S('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon:S('<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/>'),
+  palette:S('<path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.6-2.1-.4-1.2.3-2.4 1.6-2.4H17a4 4 0 0 0 4-4c0-4.4-4-9.5-9-9.5z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="14.5" cy="7" r="1"/>')
 };
 
-
-/* =====================================================
-   PHÂN TAB
-   ===================================================== */
-
-function switchTab(tabName, element){
-
-  document
-    .querySelectorAll('.tab-content')
-    .forEach(tab => {
-
-      tab.classList.remove('active');
-
-    });
-
-
-  document
-    .querySelectorAll('.tab-item')
-    .forEach(tab => {
-
-      tab.classList.remove('active');
-
-    });
-
-
-  const target =
-    document.getElementById(
-      'tab-' + tabName
-    );
-
-
-  if(target){
-
-    target.classList.add('active');
-
-  }
-
-
-  if(element){
-
-    element.classList.add('active');
-
-  }
-
-
-  if(tabName === 'stats'){
-
-    setTimeout(() => {
-
-      drawChart(
-        _lastTotals.goldTotal,
-        _lastTotals.bankTotal,
-        _lastTotals.onlineTotal
-      );
-
-    },30);
-
-  }
-
+/* ---------- Tiện ích ---------- */
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function fmt(n){return Math.round(n).toLocaleString('vi-VN')+' ₫';}
+function compact(n){var a=Math.abs(n);function f(v){return (Math.round(v*100)/100).toString().replace('.',',');}
+  if(a>=1e9)return f(n/1e9)+' tỷ';if(a>=1e6)return f(n/1e6)+' tr';if(a>=1e3)return f(n/1e3)+'k';return String(Math.round(n));}
+function digits(s){return String(s).replace(/\D/g,'');}
+function group(s){var d=digits(s).replace(/^0+(?=\d)/,'').slice(0,15);return d.replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function pad(n){return (n<10?'0':'')+n;}
+function maskDate(s){var d=digits(s).slice(0,8),o=d.slice(0,2);if(d.length>2)o+='/'+d.slice(2,4);if(d.length>4)o+='/'+d.slice(4);return o;}
+function toDisplay(v){var s=String(v||'').trim(),m=/^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+  if(m)return pad(+m[3])+'/'+pad(+m[2])+'/'+m[1];m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+  return m?pad(+m[1])+'/'+pad(+m[2])+'/'+m[3]:s;}
+function toISO(v){var m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);return m?m[3]+'-'+m[2]+'-'+m[1]:'';}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function todayDisp(){var d=new Date();return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();}
+function validDate(s){var m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);if(!m)return false;var d=+m[1],mo=+m[2],y=+m[3];
+  if(y<1900||y>2200||mo<1||mo>12)return false;var dt=new Date(y,mo-1,d);return dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d;}
+function qtyStr(n){return String(n).replace('.',',');}
+var tt;function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2200);}
+function ask(title,body,ok,danger){return new Promise(function(res){
+  $('#cTitle').textContent=title;$('#cBody').textContent=body;
+  var y=$('#cYes'),n=$('#cNo'),box=$('#confirm');y.textContent=ok||'Đồng ý';y.className='ok'+(danger?' danger':'');box.classList.add('show');
+  function done(v){box.classList.remove('show');y.onclick=n.onclick=null;res(v);}
+  y.onclick=function(){done(true);};n.onclick=function(){done(false);};});}
+function fmtInput(el,fn){
+  /* Chỉ định dạng ngay khi gõ nối tiếp ở cuối ô (giống bản cũ chạy tốt trên iPhone).
+     Sửa ở giữa dãy số: để nguyên khi đang gõ, định dạng lại khi rời ô. Không đặt lại vị trí con trỏ. */
+  el.addEventListener('input',function(){
+    var old=el.value,pos=el.selectionStart;
+    if(pos!=null&&pos>0&&pos<old.length)return;
+    var nv=fn(old);if(nv!==old)el.value=nv;
+  });
+  function fin(){var nv=fn(el.value);if(nv!==el.value)el.value=nv;}
+  el.addEventListener('blur',fin);el.addEventListener('change',fin);
 }
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){toast('Không thể lưu dữ liệu');}}
 
-
-window.switchTab = switchTab;
-
-
-/* =====================================================
-   UTIL
-   ===================================================== */
-
-function getToday(){
-
-  const d =
-    new Date();
-
-
-  return `${d.getFullYear()}-${
-    String(
-      d.getMonth()+1
-    ).padStart(2,"0")
-  }-${
-    String(
-      d.getDate()
-    ).padStart(2,"0")
-  }`;
-
+/* ---------- Giao diện sáng / tối ---------- */
+function applyTheme(t){
+  t=t==='light'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  $('#themeMeta').setAttribute('content',t==='light'?'#F3F3F9':'#0B0B14');
+  document.querySelectorAll('#themeSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.theme===t);});
 }
+$('#thDark').innerHTML=ICON.moon+'Tối';$('#thLight').innerHTML=ICON.sun+'Sáng';
+$('#icTheme').innerHTML=ICON.sun;
+$('#themeSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  lsSet('theme',b.dataset.theme);applyTheme(b.dataset.theme);});
+applyTheme(document.documentElement.getAttribute('data-theme'));
 
-
-function formatDateVN(value){
-  const s = String(value || "").trim();
-  if(!s) return "";
-  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if(m) return `${String(m[3]).padStart(2,"0")}/${String(m[2]).padStart(2,"0")}/${m[1]}`;
-  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m) return `${String(m[1]).padStart(2,"0")}/${String(m[2]).padStart(2,"0")}/${m[3]}`;
-  return s;
+/* ---------- Màu chủ đề ---------- */
+var ACCENTS=[['violet','Tím hồng','#7C3AED','#EC4899','#FF8A3D'],['ocean','Đại dương','#2563EB','#0EA5E9','#14B8A6'],
+  ['forest','Rừng xanh','#047857','#16A34A','#65A30D'],['sunset','Hoàng hôn','#E11D48','#F97316','#F59E0B']];
+$('#icAccent').innerHTML=ICON.palette;
+$('#accentSeg').innerHTML=ACCENTS.map(function(a){
+  return '<button class="sw" data-accent="'+a[0]+'"><i style="background:linear-gradient(135deg,'+a[2]+','+a[3]+' 60%,'+a[4]+')"></i>'+a[1]+'</button>';}).join('');
+function applyAccent(a){
+  if(!ACCENTS.some(function(x){return x[0]===a;}))a='violet';
+  document.documentElement.setAttribute('data-accent',a);
+  document.querySelectorAll('#accentSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.accent===a);});
 }
+$('#accentSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  lsSet('accent',b.dataset.accent);applyAccent(b.dataset.accent);});
+applyAccent(document.documentElement.getAttribute('data-accent'));
 
-function normalizeDateForInput(value){
-  const s = String(value || "").trim();
-  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m) return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
-  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if(m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
-  return "";
+/* ---------- Dữ liệu (cùng khóa lưu với bản cũ) ---------- */
+var D={gold:[],hard:[],online:[]},goldPrice=0;
+function parseArr(k){try{var a=JSON.parse(lsGet(k));return Array.isArray(a)?a:[];}catch(e){return [];}}
+function loadData(){KINDS.forEach(function(k){D[k]=parseArr(LS[k]);});goldPrice=parseInt(digits(lsGet('goldPrice')||'0'),10)||0;}
+function saveData(){KINDS.forEach(function(k){lsSet(LS[k],JSON.stringify(D[k]));});lsSet('goldPrice',goldPrice?group(String(goldPrice)):'');}
+function goldVal(i){return Math.max(0,Number(i.qty)||0)*goldPrice;}
+function totals(){var g=0,h=0,o=0;
+  D.gold.forEach(function(i){g+=goldVal(i);});
+  D.hard.forEach(function(i){h+=Math.max(0,+i.amount||0);});
+  D.online.forEach(function(i){o+=Math.max(0,+i.amount||0);});
+  return {gold:g,hard:h,online:o,all:g+h+o};}
+
+/* ---------- Hiển thị ---------- */
+var lastTotal=0,animId;
+function countTo(el,to){cancelAnimationFrame(animId);var from=lastTotal,t0=performance.now();
+  function step(t){var p=Math.min(1,(t-t0)/900),e=1-Math.pow(1-p,3);el.textContent=fmt(from+(to-from)*e);
+    if(p<1)animId=requestAnimationFrame(step);else lastTotal=to;}
+  animId=requestAnimationFrame(step);}
+function renderAssets(){
+  var t=totals();countTo($('#grand'),t.all);
+  $('#sections').innerHTML=KINDS.map(function(k){
+    var items=D[k],cards,cnt;
+    if(k==='gold'){var q=0;items.forEach(function(i){q+=Math.max(0,Number(i.qty)||0);});cnt=qtyStr(Math.round(q*1000)/1000)+' chỉ';}
+    else cnt=items.length+' sổ';
+    if(!items.length){cards='<div class="empty">'+ICON[k].replace('<svg','<svg width="28" height="28" style="opacity:.6;margin:0 auto 8px"')+'Chưa có '+NAMES[k].toLowerCase()+'. Nhấn “+ Thêm” để bắt đầu.</div>';}
+    else{cards=items.map(function(i,idx){
+      var title,desc,val,dim='',note='';
+      if(k==='gold'){title=esc(i.name);desc='Số lượng: '+qtyStr(Number(i.qty)||0)+' chỉ';note=i.note?'Ghi chú: '+esc(i.note):'';
+        if(goldPrice){val=fmt(goldVal(i));}else{val='Chưa có đơn giá';dim=' dim';}}
+      else if(k==='hard'){title=esc(i.name);desc='Ngày mở sổ: '+esc(toDisplay(i.date));val=fmt(+i.amount||0);}
+      else{title='Sổ online';desc='Ngày mở sổ: '+esc(toDisplay(i.date));val=fmt(+i.amount||0);}
+      return '<div class="item"><div class="r1"><div class="t">'+title+'</div><div class="v'+dim+'">'+val+'</div></div>'+
+        '<div class="r2"><div class="d">'+desc+'</div><div class="btns"><button class="pill e" data-edit="'+k+'" data-i="'+idx+'">'+ICON.edit+'Sửa</button><button class="pill d" data-del="'+k+'" data-i="'+idx+'">'+ICON.del+'Xóa</button></div></div>'+
+        (note?'<div class="d n">'+note+'</div>':'')+'</div>';
+    }).join('');}
+    return '<div class="zone '+k+'"><div class="sec"><span class="ic">'+ICON[k]+'</span><div class="tt"><b>'+NAMES[k]+'</b><small>'+cnt+'</small></div><button class="add" data-add="'+k+'">+ Thêm</button></div>'+cards+'</div>';
+  }).join('');
 }
-
-function formatNumber(num){
-
-  const n =
-    Number(num) || 0;
-
-
-  return n
-    .toString()
-    .replace(
-      /\B(?=(\d{3})+(?!\d))/g,
-      "."
-    );
-
+function renderStats(){
+  var t=totals(),box=$('#donutCard');
+  if(t.all<=0){box.innerHTML='<div class="empty" style="border:0">'+ICON.pie.replace('<svg','<svg width="44" height="44" style="opacity:.6;margin:0 auto 10px"')+'Chưa có dữ liệu để thống kê</div>';}
+  else{var R=78,C=2*Math.PI*R,defs='',circles='',off=0,nz=KINDS.filter(function(k){return t[k]>0;}),gap=nz.length>1?4:0;
+    KINDS.forEach(function(k){
+      defs+='<linearGradient id="g-'+k+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+SOLID[k][0]+'"/><stop offset="1" stop-color="'+SOLID[k][1]+'"/></linearGradient>';
+      if(t[k]<=0)return;var len=t[k]/t.all*C;
+      circles+='<circle data-len="'+Math.max(0,len-gap)+'" data-c="'+C+'" cx="100" cy="100" r="'+R+'" stroke="url(#g-'+k+')" stroke-dasharray="0 '+C+'" stroke-dashoffset="'+(-(off+gap/2))+'"/>';off+=len;});
+    box.innerHTML='<div class="donut-wrap"><svg viewBox="0 0 200 200"><defs>'+defs+'</defs><circle cx="100" cy="100" r="'+R+'" stroke="var(--track)"/>'+circles+'</svg><div class="donut-mid"><small>Tổng</small><b>'+compact(t.all)+'</b><span>VND</span></div></div>';
+    requestAnimationFrame(function(){requestAnimationFrame(function(){box.querySelectorAll('circle[data-len]').forEach(function(c){c.setAttribute('stroke-dasharray',c.dataset.len+' '+c.dataset.c);});});});}
+  var ordered=KINDS.slice().sort(function(a,b){return t[b]-t[a];});
+  $('#stats-rows').innerHTML=ordered.map(function(k){var p=t.all>0?t[k]/t.all:0;
+    return '<div class="rowx"><div class="trow"><div class="c1"><span class="dot" style="background:'+GRAD[k]+'"></span>'+NAMES[k]+'</div><div class="c2">'+fmt(t[k])+'</div><div class="c3"><span class="chip" style="color:'+COLOR[k]+'">'+(p*100).toFixed(1).replace('.',',')+'%</span></div></div><div class="bar"><i data-w="'+(p*100)+'" style="background:'+GRAD[k]+'"></i></div></div>';}).join('');
+  $('#stats-sum').innerHTML='<div class="c1">Tổng cộng</div><div class="c2">'+fmt(t.all)+'</div><div class="c3">'+(t.all>0?'100%':'0%')+'</div>';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){document.querySelectorAll('.bar i').forEach(function(i){i.style.width=i.dataset.w+'%';});});});
 }
+function renderAll(){renderAssets();renderStats();}
 
+/* ---------- Điều hướng ---------- */
+var TABS=[['assets','wallet','Tài sản'],['stats','pie','Thống kê'],['settings','cog','Cài đặt']];
+$('#nav').innerHTML=TABS.map(function(t,i){return '<button data-tab="'+t[0]+'" class="'+(i===0?'active':'')+'">'+ICON[t[1]]+'<span>'+t[2]+'</span></button>';}).join('');
+$('#icGoldSet').innerHTML=ICON.gold;$('#icLock').innerHTML=ICON.lock;$('#icBackup').innerHTML=ICON.cloud;
+function showTab(n){
+  document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('active',s.id==='tab-'+n);});
+  document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('active',b.dataset.tab===n);});
+  window.scrollTo(0,0);if(n==='stats')renderStats();}
+$('#nav').addEventListener('click',function(e){var b=e.target.closest('button');if(b)showTab(b.dataset.tab);});
 
-function parseNumber(str){
-
-  return Number(
-    (str || "")
-      .toString()
-      .replace(/\./g,"")
-  ) || 0;
-
+/* ---------- Form thêm / sửa ---------- */
+var FORMS={
+  gold:{title:'vàng',fields:[{k:'name',label:'Tên cửa hàng',kind:'text'},{k:'qty',label:'Số lượng',kind:'qty',suf:'chỉ',ph:'VD: 5 hoặc 2,5'},{k:'note',label:'Ghi chú',kind:'textarea'}]},
+  hard:{title:'sổ tiết kiệm cứng',fields:[{k:'name',label:'Tên ngân hàng',kind:'text'},{k:'amount',label:'Số tiền',kind:'money',suf:'VND',ph:'0'},{k:'date',label:'Ngày mở sổ',kind:'date'}]},
+  online:{title:'sổ tiết kiệm online',fields:[{k:'amount',label:'Số tiền',kind:'money',suf:'VND',ph:'0'},{k:'date',label:'Ngày mở sổ',kind:'date'}]}
+};
+var editing=null;
+function openForm(type,idx){
+  var isEdit=idx!=null;editing={type:type,idx:isEdit?+idx:null};
+  var cfg=FORMS[type],item=isEdit?D[type][idx]:null;
+  $('#sheetTitle').innerHTML='<span class="ic" style="background:'+GRAD[type]+'">'+ICON[type]+'</span>'+(isEdit?'Sửa ':'Thêm ')+cfg.title;
+  $('#formErr').textContent='';$('#formSave').style.background=GRAD[type];$('#formSave').textContent=isEdit?'Lưu thay đổi':'Thêm mới';
+  $('#formFields').innerHTML=cfg.fields.map(function(f){
+    var val=item?item[f.k]:(f.kind==='date'?todayISO():'');if(val==null)val='';
+    if(item&&f.kind==='money')val=group(String(item[f.k]));
+    if(item&&f.kind==='qty')val=qtyStr(item[f.k]);
+    if(item&&f.kind==='date')val=toISO(toDisplay(item[f.k]));
+    var input,suf=f.suf?'<span class="suf">'+f.suf+'</span>':'';
+    if(f.kind==='textarea')input='<textarea id="f_'+f.k+'" rows="3">'+esc(val)+'</textarea>';
+    else{var mode=f.kind==='money'||f.kind==='date'?'numeric':(f.kind==='qty'?'decimal':'text');
+      if(f.kind==='date')input='<input id="f_'+f.k+'" type="date" value="'+esc(val)+'">';
+      else input='<div class="inp"><input id="f_'+f.k+'" class="'+(f.suf?'has-suf':'')+'" type="text" inputmode="'+mode+'" autocomplete="off" placeholder="'+esc(f.ph||'')+'" value="'+esc(val)+'">'+suf+'</div>';}
+    return '<div class="field"><label for="f_'+f.k+'">'+f.label+'</label>'+input+'</div>';}).join('');
+  cfg.fields.forEach(function(f){var el=$('#f_'+f.k);
+    if(f.kind==='money')fmtInput(el,group);
+    if(f.kind==='qty')fmtInput(el,function(x){var v=x.replace(/[^\d.,]/g,'').replace('.',',');var i=v.indexOf(',');
+      if(i>=0)v=v.slice(0,i+1)+v.slice(i+1).replace(/,/g,'');return v.slice(0,10);});});
+  $('#overlay').classList.add('show');
 }
-
-
-function formatInput(input){
-
-  input.addEventListener(
-    "input",
-    () => {
-
-      let v =
-        (input.value || "")
-          .replace(/\D/g,"");
-
-
-      input.value =
-        v
-          ? formatNumber(
-              Number(v)
-            )
-          : "";
-
-    }
-  );
-
-}
-
-
-function clampMoney(n){
-
-  n =
-    Number(n) || 0;
-
-
-  return n < 0 ? 0 : n;
-
-}
-
-
-function clampQty(n){
-
-  n =
-    Number(n) || 0;
-
-
-  return n < 0 ? 0 : n;
-
-}
-
-
-function debounce(fn,wait=120){
-
-  let t;
-
-
-  return (...a) => {
-
-    clearTimeout(t);
-
-
-    t =
-      setTimeout(
-        () => fn(...a),
-        wait
-      );
-
-  };
-
-}
-
-
-/* =====================================================
-   AUTO LOCK
-   ===================================================== */
-
-function getAutoLockMinutes(){
-
-  const saved =
-    Number(
-      localStorage.getItem(
-        AUTO_LOCK_STORAGE_KEY
-      )
-    );
-
-  if(
-    Number.isFinite(saved) &&
-    saved >= 0
-  ){
-
-    return saved;
-
-  }
-
-  return DEFAULT_AUTO_LOCK_MINUTES;
-
-}
-
-
-function loadAutoLockSetting(){
-
-  const minutes =
-    getAutoLockMinutes();
-
-  if(autoLockSelect){
-
-    autoLockSelect.value =
-      String(minutes);
-
-  }
-
-}
-
-
-function saveAutoLockSetting(){
-
-  const minutes =
-    Number(
-      autoLockSelect.value
-    );
-
-  localStorage.setItem(
-    AUTO_LOCK_STORAGE_KEY,
-    String(
-      Number.isFinite(minutes)
-        ? Math.max(0, minutes)
-        : DEFAULT_AUTO_LOCK_MINUTES
-    )
-  );
-
-  resetTimer();
-
-}
-
-
-function resetTimer(){
-
-  clearTimeout(lockTimer);
-
-  lockTimer = null;
-
-  const minutes =
-    getAutoLockMinutes();
-
-  /* 0 = tắt tự động khóa */
-  if(minutes <= 0){
-
-    return;
-
-  }
-
-  lockTimer =
-    setTimeout(
-      () => lockApp(),
-      minutes * 60 * 1000
-    );
-
-}
-
-
-function lockApp(){
-
-  clearTimeout(lockTimer);
-
-  lockTimer = null;
-
-  app.style.display =
-    "none";
-
-
-  lockScreen.style.display =
-    "flex";
-
-
-  pinInput.value = "";
-
-}
-
-
-/* =====================================================
-   PIN
-   ===================================================== */
-
+function closeForm(){$('#overlay').classList.remove('show');editing=null;}
+function submitForm(){
+  if(!editing)return;var type=editing.type,cfg=FORMS[type],rec={},err='';
+  cfg.fields.forEach(function(f){if(err)return;var v=$('#f_'+f.k).value.trim();
+    if(f.kind==='qty')v=v.replace(/[^\d.,]/g,'').replace('.',',');
+    if(f.kind==='text'){if(!v)err='Vui lòng nhập '+f.label.toLowerCase();rec[f.k]=v;}
+    else if(f.kind==='textarea'){rec[f.k]=v;}
+    else if(f.kind==='money'){var n=parseInt(digits(v)||'0',10);if(!(n>0))err='Vui lòng nhập số tiền hợp lệ';rec[f.k]=n;}
+    else if(f.kind==='qty'){var q=parseFloat(v.replace(',','.'));if(!(q>0)||!/^\d+(,\d+)?$/.test(v))err='Vui lòng nhập số lượng hợp lệ';rec[f.k]=q;}
+    else if(f.kind==='date'){if(!v||!validDate(toDisplay(v)))err='Vui lòng chọn ngày mở sổ';rec[f.k]=v;}});
+  if(err){$('#formErr').textContent=err;return;}
+  if(editing.idx!=null)D[type][editing.idx]=rec;else D[type].push(rec);
+  saveData();renderAll();closeForm();toast('Đã lưu');resetTimer();}
+$('#formSave').addEventListener('click',submitForm);
+$('#formCancel').addEventListener('click',closeForm);
+$('#overlay').addEventListener('click',function(e){if(e.target===this)closeForm();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeForm();});
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.add)openForm(b.dataset.add);
+  else if(b.dataset.edit)openForm(b.dataset.edit,b.dataset.i);
+  else if(b.dataset.del){var k=b.dataset.del,i=+b.dataset.i;
+    ask('Xóa mục này?','Dữ liệu sẽ bị xóa khỏi ứng dụng.','Xóa',true).then(function(ok){if(ok){D[k].splice(i,1);saveData();renderAll();}});}});
+
+/* ---------- Đơn giá vàng ---------- */
+var gp=$('#goldPrice');
+fmtInput(gp,group);
+var gpT;gp.addEventListener('input',function(){goldPrice=parseInt(digits(gp.value)||'0',10)||0;saveData();clearTimeout(gpT);gpT=setTimeout(renderAll,250);resetTimer();});
+
+/* ---------- Sao lưu / phục hồi (định dạng cũ) ---------- */
+function download(text,name){var url=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
+  var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},4000);toast('Đã xuất file sao lưu');}
+$('#exportBtn').addEventListener('click',function(){
+  var d=new Date(),name='QLTS_backup_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+pad(d.getSeconds())+'.json';
+  var text=JSON.stringify({goldPrice:goldPrice,golds:D.gold,banks:D.hard,onlines:D.online},null,2),file;
+  try{file=new File([text],name,{type:'application/json'});}catch(e){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Sao lưu tài sản'}).then(function(){toast('Đã xuất file sao lưu');}).catch(function(err){if(err&&err.name!=='AbortError')download(text,name);});
+  }else download(text,name);});
+$('#importBtn').addEventListener('click',function(){$('#importFile').click();});
+$('#importFile').addEventListener('change',function(){
+  var f=this.files&&this.files[0],input=this;if(!f)return;var rd=new FileReader();
+  rd.onload=function(){var d;
+    try{d=JSON.parse(rd.result);if(!d||!('golds' in d)||!('banks' in d)||!('onlines' in d))throw 0;}
+    catch(e){toast('File không hợp lệ');input.value='';return;}
+    var n=function(a){return Array.isArray(a)?a.length:0;};
+    ask('Phục hồi dữ liệu?','Dữ liệu hiện tại sẽ bị ghi đè bởi file "'+f.name+'".\n\nVàng: '+n(d.golds)+' mục\nSổ cứng: '+n(d.banks)+' mục\nSổ online: '+n(d.onlines)+' mục\nĐơn giá vàng: '+(d.goldPrice?group(String(Math.round(Number(d.goldPrice)||0)))+' VND':'—'),'Phục hồi',true).then(function(ok){
+      if(ok){D.gold=Array.isArray(d.golds)?d.golds:[];D.hard=Array.isArray(d.banks)?d.banks:[];D.online=Array.isArray(d.onlines)?d.onlines:[];
+        goldPrice=Math.round(Number(d.goldPrice)||0);saveData();gp.value=goldPrice?group(String(goldPrice)):'';renderAll();resetTimer();toast('Phục hồi dữ liệu thành công');}
+      input.value='';});};
+  rd.onerror=function(){toast('Không đọc được file');};rd.readAsText(f,'utf-8');});
+
+/* ---------- Khóa / tự động khóa ---------- */
+var lockTimer=null,unlocked=false,sel=$('#autoLockSelect');
+function lockMinutes(){var v=lsGet(AUTO_KEY);if(v===null||v==='')return DEFAULT_LOCK;var n=Number(v);return isFinite(n)&&n>=0?n:DEFAULT_LOCK;}
+sel.value=String(lockMinutes());
+sel.addEventListener('change',function(){lsSet(AUTO_KEY,String(Math.max(0,Number(sel.value)||0)));resetTimer();});
+function resetTimer(){clearTimeout(lockTimer);lockTimer=null;if(!unlocked)return;var m=lockMinutes();if(m<=0)return;lockTimer=setTimeout(lockApp,m*60000);}
+function lockApp(){unlocked=false;clearTimeout(lockTimer);closeForm();$('#confirm').classList.remove('show');
+  $('#app').style.display='none';$('#nav').classList.remove('show');$('#lock').style.display='flex';$('#pinInput').value='';$('#pinError').textContent='';}
 function checkPIN(){
+  if($('#pinInput').value===FIXED_PIN){
+    unlocked=true;$('#lock').style.display='none';$('#app').style.display='block';$('#nav').classList.add('show');
+    loadData();gp.value=goldPrice?group(String(goldPrice)):'';lastTotal=0;renderAll();showTab('assets');resetTimer();$('#pinError').textContent='';
+  }else{$('#pinError').textContent='Sai mật khẩu, vui lòng thử lại.';var b=$('#lockbox');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}}
+$('#pinBtn').addEventListener('click',checkPIN);
+$('#pinInput').addEventListener('keydown',function(e){if(e.key==='Enter')checkPIN();});
+$('#lockNow').addEventListener('click',lockApp);
+['click','keydown','touchstart'].forEach(function(ev){document.addEventListener(ev,resetTimer,{passive:true});});
 
-  if(
-    pinInput.value === FIXED_PIN
-  ){
-
-    lockScreen.style.display =
-      "none";
-
-
-    app.style.display =
-      "block";
-
-
-    loadData();
-
-
-    if(
-      !bankDate.value
-    ){
-
-      bankDate.value =
-        getToday();
-
-    }
-
-
-    if(
-      !onlineDate.value
-    ){
-
-      onlineDate.value =
-        getToday();
-
-    }
-
-
-    resetTimer();
-
-
-    pinError.innerText = "";
-
-  }
-
-  else{
-
-    pinError.innerText =
-      "Sai mật khẩu!";
-
-  }
-
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});
 }
-
-
-window.checkPIN =
-  checkPIN;
-
-
-pinInput.addEventListener(
-  'keydown',
-  e => {
-
-    if(
-      e.key === 'Enter'
-    ){
-
-      checkPIN();
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   STORAGE
-   ===================================================== */
-
-function saveData(){
-
-  localStorage.setItem(
-    "golds",
-    JSON.stringify(golds)
-  );
-
-
-  localStorage.setItem(
-    "banks",
-    JSON.stringify(banks)
-  );
-
-
-  localStorage.setItem(
-    "onlines",
-    JSON.stringify(onlines)
-  );
-
-
-  localStorage.setItem(
-    "goldPrice",
-    goldPrice.value
-  );
-
-}
-
-
-function loadData(){
-
-  golds =
-    JSON.parse(
-      localStorage.getItem("golds")
-    ) || [];
-
-
-  banks =
-    JSON.parse(
-      localStorage.getItem("banks")
-    ) || [];
-
-
-  onlines =
-    JSON.parse(
-      localStorage.getItem("onlines")
-    ) || [];
-
-
-  goldPrice.value =
-    localStorage.getItem(
-      "goldPrice"
-    ) || "";
-
-
-  render();
-
-}
-
-
-/* =====================================================
-   VÀNG
-   ===================================================== */
-
-function addGold(){
-
-  if(
-    !goldName.value ||
-    !goldQty.value
-  ){
-
-    return;
-
-  }
-
-
-  golds.push({
-
-    name:
-      goldName.value,
-
-    qty:
-      clampQty(
-        Number(
-          goldQty.value
-        )
-      ),
-
-    note:
-      goldNote.value || ""
-
-  });
-
-
-  goldName.value = "";
-
-  goldQty.value = "";
-
-  goldNote.value = "";
-
-
-  saveData();
-
-  render();
-
-  resetTimer();
-
-}
-
-
-function editGold(i){
-  const g = golds[i];
-  if(!g) return;
-  editingGoldIndex = i;
-  goldEditName.value = g.name || "";
-  goldEditQty.value = g.qty ?? "";
-  goldEditNote.value = g.note || "";
-  showEditModal(goldEditModal);
-  setTimeout(() => goldEditName.focus(), 30);
-}
-
-
-function deleteGold(i){
-
-  if(
-    confirm(
-      "Xoá mục này?"
-    )
-  ){
-
-    golds.splice(i,1);
-
-    saveData();
-
-    render();
-
-  }
-
-}
-
-
-window.addGold =
-  addGold;
-
-window.editGold =
-  editGold;
-
-window.deleteGold =
-  deleteGold;
-
-
-/* =====================================================
-   SỔ CỨNG
-   ===================================================== */
-
-function addBank(){
-
-  if(
-    !bankName.value ||
-    !bankAmount.value
-  ){
-
-    return;
-
-  }
-
-
-  banks.push({
-
-    name:
-      bankName.value,
-
-    amount:
-      clampMoney(
-        parseNumber(
-          bankAmount.value
-        )
-      ),
-
-    date:
-      bankDate.value ||
-      getToday()
-
-  });
-
-
-  bankName.value = "";
-
-  bankAmount.value = "";
-
-  bankDate.value = "";
-
-
-  saveData();
-
-  render();
-
-  resetTimer();
-
-}
-
-
-function editBank(i){
-  const b = banks[i];
-  if(!b) return;
-  editingBankIndex = i;
-  bankEditName.value = b.name || "";
-  bankEditAmount.value = formatNumber(b.amount || 0);
-  bankEditDate.value = normalizeDateForInput(b.date || "");
-  showEditModal(bankEditModal);
-  setTimeout(() => bankEditName.focus(), 30);
-}
-
-
-function deleteBank(i){
-
-  if(
-    confirm(
-      "Xoá mục này?"
-    )
-  ){
-
-    banks.splice(i,1);
-
-    saveData();
-
-    render();
-
-  }
-
-}
-
-
-window.addBank =
-  addBank;
-
-window.editBank =
-  editBank;
-
-window.deleteBank =
-  deleteBank;
-
-
-/* =====================================================
-   SỔ ONLINE
-   ===================================================== */
-
-function addOnline(){
-
-  if(
-    !onlineAmountInput.value
-  ){
-
-    return;
-
-  }
-
-
-  onlines.push({
-
-    amount:
-      clampMoney(
-        parseNumber(
-          onlineAmountInput.value
-        )
-      ),
-
-    date:
-      onlineDate.value ||
-      getToday()
-
-  });
-
-
-  onlineAmountInput.value = "";
-
-  onlineDate.value = "";
-
-
-  saveData();
-
-  render();
-
-  resetTimer();
-
-}
-
-
-function editOnline(i){
-  const o = onlines[i];
-  if(!o) return;
-  editingOnlineIndex = i;
-  onlineEditAmount.value = formatNumber(o.amount || 0);
-  onlineEditDate.value = normalizeDateForInput(o.date || "");
-  showEditModal(onlineEditModal);
-  setTimeout(() => onlineEditAmount.focus(), 30);
-}
-
-
-
-/* ===== LOGIC 3 FORM SỬA RIÊNG ===== */
-const goldEditModal = document.getElementById("goldEditModal");
-const bankEditModal = document.getElementById("bankEditModal");
-const onlineEditModal = document.getElementById("onlineEditModal");
-
-let editingGoldIndex = null;
-let editingBankIndex = null;
-let editingOnlineIndex = null;
-
-function showEditModal(modal){
-  modal.classList.add("show");
-  modal.setAttribute("aria-hidden","false");
-}
-function hideEditModal(modal){
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden","true");
-}
-
-document.getElementById("goldEditForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  if(editingGoldIndex === null) return;
-  const g = golds[editingGoldIndex];
-  if(!g) return;
-  const name = goldEditName.value.trim();
-  const qty = clampQty(goldEditQty.value);
-  if(!name) return alert("Vui lòng nhập tên cửa hàng.");
-  if(!(Number(qty) > 0)) return alert("Vui lòng nhập số lượng hợp lệ.");
-  golds[editingGoldIndex] = {
-    name:name,
-    qty:Number(qty),
-    note:goldEditNote.value
-  };
-  saveData();
-  render();
-  resetTimer();
-  hideEditModal(goldEditModal);
-  editingGoldIndex = null;
-});
-
-document.getElementById("bankEditForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  if(editingBankIndex === null) return;
-  const b = banks[editingBankIndex];
-  if(!b) return;
-  const name = bankEditName.value.trim();
-  const amount = clampMoney(parseNumber(bankEditAmount.value));
-  const date = bankEditDate.value || b.date || getToday();
-  if(!name) return alert("Vui lòng nhập tên ngân hàng.");
-  if(!(amount > 0)) return alert("Vui lòng nhập số tiền hợp lệ.");
-  banks[editingBankIndex] = {
-    name:name,
-    amount:amount,
-    date:date
-  };
-  saveData();
-  render();
-  resetTimer();
-  hideEditModal(bankEditModal);
-  editingBankIndex = null;
-});
-
-document.getElementById("onlineEditForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  if(editingOnlineIndex === null) return;
-  const o = onlines[editingOnlineIndex];
-  if(!o) return;
-  const amount = clampMoney(parseNumber(onlineEditAmount.value));
-  const date = onlineEditDate.value || o.date || getToday();
-  if(!(amount > 0)) return alert("Vui lòng nhập số tiền hợp lệ.");
-  onlines[editingOnlineIndex] = {
-    amount:amount,
-    date:date
-  };
-  saveData();
-  render();
-  resetTimer();
-  hideEditModal(onlineEditModal);
-  editingOnlineIndex = null;
-});
-
-[
-  ["goldEditClose","goldEditCancel",goldEditModal],
-  ["bankEditClose","bankEditCancel",bankEditModal],
-  ["onlineEditClose","onlineEditCancel",onlineEditModal]
-].forEach(function(item){
-  const closeId = item[0];
-  const cancelId = item[1];
-  const modal = item[2];
-  document.getElementById(closeId).addEventListener("click",function(){
-    hideEditModal(modal);
-  });
-  document.getElementById(cancelId).addEventListener("click",function(){
-    hideEditModal(modal);
-  });
-  modal.addEventListener("click",function(e){
-    if(e.target === modal) hideEditModal(modal);
-  });
-});
-
-document.addEventListener("keydown",function(e){
-  if(e.key === "Escape"){
-    hideEditModal(goldEditModal);
-    hideEditModal(bankEditModal);
-    hideEditModal(onlineEditModal);
-    editingGoldIndex = null;
-    editingBankIndex = null;
-    editingOnlineIndex = null;
-  }
-});
-
-function deleteOnline(i){
-
-  if(
-    confirm(
-      "Xoá mục này?"
-    )
-  ){
-
-    onlines.splice(i,1);
-
-    saveData();
-
-    render();
-
-  }
-
-}
-
-
-window.addOnline =
-  addOnline;
-
-window.editOnline =
-  editOnline;
-
-window.deleteOnline =
-  deleteOnline;
-
-
-/* =====================================================
-   BIỂU ĐỒ
-   ===================================================== */
-
-function drawChart(
-  goldTotal,
-  bankTotal,
-  onlineTotal
-){
-
-  const canvas =
-    assetCanvas;
-
-
-  if(!canvas){
-
-    return;
-
-  }
-
-
-  const parentW =
-    canvas.parentElement
-      ? canvas.parentElement.clientWidth
-      : 320;
-
-
-  const cssWidth =
-    canvas.clientWidth ||
-    parentW ||
-    320;
-
-
-  const cssHeight =
-    240;
-
-
-  const dpr =
-    window.devicePixelRatio ||
-    1;
-
-
-  canvas.style.height =
-    cssHeight + "px";
-
-
-  canvas.width =
-    Math.max(
-      240,
-      cssWidth
-    ) * dpr;
-
-
-  canvas.height =
-    cssHeight * dpr;
-
-
-  const ctx =
-    canvas.getContext('2d');
-
-
-  ctx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
-  );
-
-
-  ctx.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-
-  const data = [
-
-    goldTotal,
-
-    bankTotal,
-
-    onlineTotal
-
-  ];
-
-
-  const colors = [
-
-    '#FFD700',
-
-    '#007AFF',
-
-    '#34C759'
-
-  ];
-
-
-  const icons = [
-
-    '🥇',
-
-    '🏦',
-
-    '💳'
-
-  ];
-
-
-  const total =
-    data.reduce(
-      (a,b) => a+b,
-      0
-    );
-
-
-  const cx =
-    (canvas.width / dpr) / 2;
-
-
-  const cy =
-    (canvas.height / dpr) / 2 + 5;
-
-
-  const radius =
-    Math.min(
-      canvas.width / dpr,
-      canvas.height / dpr
-    ) / 2 - 10;
-
-
-  if(total <= 0){
-
-    ctx.fillStyle = '#999';
-
-    ctx.font =
-      'bold 14px -apple-system,system-ui,Segoe UI,Roboto,Arial';
-
-    ctx.textAlign =
-      'center';
-
-    ctx.fillText(
-      'Chưa có dữ liệu để vẽ biểu đồ',
-      cx,
-      cy
-    );
-
-    return;
-
-  }
-
-
-  let start =
-    -Math.PI / 2;
-
-
-  for(
-    let i=0;
-    i<data.length;
-    i++
-  ){
-
-    const v =
-      data[i];
-
-
-    if(v <= 0){
-
-      continue;
-
-    }
-
-
-    const angle =
-      v / total *
-      Math.PI * 2;
-
-
-    const end =
-      start + angle;
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-      cx,
-      cy
-    );
-
-
-    ctx.arc(
-      cx,
-      cy,
-      radius,
-      start,
-      end,
-      false
-    );
-
-
-    ctx.closePath();
-
-
-    ctx.fillStyle =
-      colors[i];
-
-
-    ctx.fill();
-
-
-    const mid =
-      (start + end) / 2;
-
-
-    const rx =
-      cx +
-      Math.cos(mid) *
-      radius *
-      .65;
-
-
-    const ry =
-      cy +
-      Math.sin(mid) *
-      radius *
-      .65;
-
-
-    const pct =
-      (
-        v /
-        total *
-        100
-      ).toFixed(1) + '%';
-
-
-    ctx.lineWidth = 4;
-
-    ctx.strokeStyle =
-      'rgba(0,0,0,.25)';
-
-
-    ctx.font =
-      'bold 13px -apple-system,system-ui,Segoe UI,Roboto,Arial';
-
-
-    ctx.textAlign =
-      'center';
-
-
-    ctx.textBaseline =
-      'middle';
-
-
-    ctx.strokeText(
-      `${icons[i]} ${pct}`,
-      rx,
-      ry
-    );
-
-
-    ctx.fillStyle =
-      '#fff';
-
-
-    ctx.fillText(
-      `${icons[i]} ${pct}`,
-      rx,
-      ry
-    );
-
-
-    start =
-      end;
-
-  }
-
-
-  ctx.beginPath();
-
-
-  ctx.arc(
-    cx,
-    cy,
-    radius,
-    0,
-    Math.PI * 2
-  );
-
-
-  ctx.lineWidth = 1;
-
-
-  ctx.strokeStyle =
-    'rgba(255,255,255,.8)';
-
-
-  ctx.stroke();
-
-}
-
-
-/* =====================================================
-   RENDER
-   ===================================================== */
-
-function render(){
-
-  let price =
-    parseNumber(
-      goldPrice.value
-    );
-
-
-  goldPrice.value =
-    price
-      ? formatNumber(price)
-      : "";
-
-
-  let goldTotal = 0;
-
-
-  goldList.innerHTML =
-    golds.map(
-      (g,i) => {
-
-        const qty =
-          Math.max(
-            0,
-            Number(g.qty) || 0
-          );
-
-
-        const total =
-          qty * price;
-
-
-        goldTotal +=
-          total;
-
-
-        return `
-          <div class="item">
-
-            ${g.name}
-            -
-            ${qty}
-            chỉ
-            ×
-            ${formatNumber(price)}
-            =
-            ${formatNumber(total)}
-            VND
-
-            ${
-              g.note
-                ? `<br>📝 ${g.note}`
-                : ""
-            }
-
-            <br>
-
-            <button
-              class="editBtn"
-              onclick="editGold(${i})">
-
-              Sửa
-
-            </button>
-
-            <button
-              class="deleteBtn"
-              onclick="deleteGold(${i})">
-
-              Xoá
-
-            </button>
-
-          </div>
-        `;
-
-      }
-    ).join("");
-
-
-  let bankTotal = 0;
-
-
-  bankList.innerHTML =
-    banks.map(
-      (b,i) => {
-
-        const amt =
-          Math.max(
-            0,
-            Number(b.amount) || 0
-          );
-
-
-        bankTotal +=
-          amt;
-
-
-        return `
-          <div class="item">
-
-            ${b.name}
-            -
-            ${formatNumber(amt)}
-            VND
-
-            <br>
-
-            Ngày mở:
-            ${formatDateVN(b.date)}
-
-            <br>
-
-            <button
-              class="editBtn"
-              onclick="editBank(${i})">
-
-              Sửa
-
-            </button>
-
-            <button
-              class="deleteBtn"
-              onclick="deleteBank(${i})">
-
-              Xoá
-
-            </button>
-
-          </div>
-        `;
-
-      }
-    ).join("");
-
-
-  let onlineTotal = 0;
-
-
-  onlineList.innerHTML =
-    onlines.map(
-      (o,i) => {
-
-        const amt =
-          Math.max(
-            0,
-            Number(o.amount) || 0
-          );
-
-
-        onlineTotal +=
-          amt;
-
-
-        return `
-          <div class="item">
-
-            ${formatNumber(amt)}
-            VND
-
-            <br>
-
-            Ngày mở:
-            ${formatDateVN(o.date)}
-
-            <br>
-
-            <button
-              class="editBtn"
-              onclick="editOnline(${i})">
-
-              Sửa
-
-            </button>
-
-            <button
-              class="deleteBtn"
-              onclick="deleteOnline(${i})">
-
-              Xoá
-
-            </button>
-
-          </div>
-        `;
-
-      }
-    ).join("");
-
-
-  const totalAsset =
-    goldTotal +
-    bankTotal +
-    onlineTotal;
-
-
-  grandTotal.innerText =
-    "Tổng tài sản: " +
-    formatNumber(
-      totalAsset
-    ) +
-    " VND";
-
-
-  statsTotal.innerText =
-    formatNumber(
-      totalAsset
-    ) +
-    " VND";
-
-
-  const statsRows = [
-
-    {
-      name: '🥇 Vàng',
-      value: goldTotal
-    },
-
-    {
-      name: '🏦 Sổ tiết kiệm cứng',
-      value: bankTotal
-    },
-
-    {
-      name: '💳 Sổ tiết kiệm online',
-      value: onlineTotal
-    }
-
-  ].sort((a,b) => b.value - a.value);
-
-
-  assetSummary.innerHTML = `
-
-    <table class="stats-table">
-
-      <thead>
-        <tr>
-          <th class="stats-rank">#</th>
-          <th class="stats-name">Loại tài sản</th>
-          <th>Giá trị</th>
-          <th>Tỷ lệ</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        ${totalAsset > 0
-          ? statsRows.map((item, index) => {
-
-              const pct =
-                item.value / totalAsset * 100;
-
-              return `
-                <tr>
-                  <td class="stats-rank">${index + 1}</td>
-                  <td class="stats-name">${item.name}</td>
-                  <td class="stats-value">
-                    ${formatNumber(item.value)} VND
-                  </td>
-                  <td class="stats-percent">
-                    ${pct.toFixed(1)}%
-                  </td>
-                </tr>
-              `;
-
-            }).join('')
-          : `
-              <tr>
-                <td colspan="4" class="stats-empty">
-                  Chưa có dữ liệu tài sản
-                </td>
-              </tr>
-            `
-        }
-      </tbody>
-
-    </table>
-
-  `;
-
-
-  _lastTotals = {
-
-    goldTotal,
-
-    bankTotal,
-
-    onlineTotal
-
-  };
-
-
-  drawChart(
-    goldTotal,
-    bankTotal,
-    onlineTotal
-  );
-
-}
-
-
-/* =====================================================
-   SAO LƯU JSON
-   ===================================================== */
-
-function exportToJSON(){
-
-  try{
-
-    const snapshot = {
-
-      goldPrice:
-        parseNumber(
-          goldPrice.value ||
-          "0"
-        ),
-
-      golds:golds,
-
-      banks:banks,
-
-      onlines:onlines
-
-    };
-
-
-    const blob =
-      new Blob(
-        [
-          JSON.stringify(
-            snapshot,
-            null,
-            2
-          )
-        ],
-        {
-          type:
-            "application/json;charset=utf-8"
-        }
-      );
-
-
-    const url =
-      URL.createObjectURL(
-        blob
-      );
-
-
-    const a =
-      document.createElement(
-        "a"
-      );
-
-
-    const ts =
-      new Date();
-
-
-    const pad =
-      n =>
-        String(n)
-          .padStart(2,'0');
-
-
-    const filename =
-      `QLTS_backup_${
-        ts.getFullYear()
-      }${
-        pad(
-          ts.getMonth()+1
-        )
-      }${
-        pad(
-          ts.getDate()
-        )
-      }_${
-        pad(
-          ts.getHours()
-        )
-      }${
-        pad(
-          ts.getMinutes()
-        )
-      }${
-        pad(
-          ts.getSeconds()
-        )
-      }.json`;
-
-
-    a.href =
-      url;
-
-
-    a.download =
-      filename;
-
-
-    document.body.appendChild(
-      a
-    );
-
-
-    a.click();
-
-
-    a.remove();
-
-
-    URL.revokeObjectURL(
-      url
-    );
-
-  }
-
-  catch(e){
-
-    console.error(e);
-
-    alert(
-      "Lỗi khi xuất JSON! Vui lòng thử lại."
-    );
-
-  }
-
-}
-
-
-window.exportToJSON =
-  exportToJSON;
-
-
-/* =====================================================
-   PHỤC HỒI JSON
-   ===================================================== */
-
-function importFromFile(){
-
-  const file =
-    restoreFile.files[0];
-
-
-  if(!file){
-
-    alert(
-      "Vui lòng chọn file .json để phục hồi."
-    );
-
-    return;
-
-  }
-
-
-  const reader =
-    new FileReader();
-
-
-  reader.onload =
-    function(evt){
-
-      try{
-
-        const text =
-          evt.target.result;
-
-
-        const data =
-          JSON.parse(
-            text
-          );
-
-
-        if(
-          !data ||
-          !('golds' in data) ||
-          !('banks' in data) ||
-          !('onlines' in data)
-        ){
-
-          throw new Error(
-            "Cấu trúc file không hợp lệ."
-          );
-
-        }
-
-
-        const fileCounts =
-
-          `Vàng: ${
-            Array.isArray(
-              data.golds
-            )
-              ? data.golds.length
-              : 0
-          } mục\n` +
-
-          `Sổ cứng: ${
-            Array.isArray(
-              data.banks
-            )
-              ? data.banks.length
-              : 0
-          } mục\n` +
-
-          `Sổ online: ${
-            Array.isArray(
-              data.onlines
-            )
-              ? data.onlines.length
-              : 0
-          } mục\n` +
-
-          `Đơn giá vàng: ${
-            data.goldPrice
-              ? formatNumber(
-                  Number(
-                    data.goldPrice
-                  )
-                ) +
-                ' VND'
-              : '—'
-          }`;
-
-
-        const confirmMsg =
-
-`Phục hồi dữ liệu từ file "${file.name}".
-
-Dữ liệu hiện tại sẽ bị GHI ĐÈ hoàn toàn bởi dữ liệu trong file.
-
-Nội dung trong file:
-
-${fileCounts}
-
-Bạn có chắc chắn muốn TIẾP TỤC?`;
-
-
-        if(
-          !confirm(
-            confirmMsg
-          )
-        ){
-
-          return;
-
-        }
-
-
-        golds =
-          Array.isArray(
-            data.golds
-          )
-            ? data.golds
-            : [];
-
-
-        banks =
-          Array.isArray(
-            data.banks
-          )
-            ? data.banks
-            : [];
-
-
-        onlines =
-          Array.isArray(
-            data.onlines
-          )
-            ? data.onlines
-            : [];
-
-
-        const gp =
-          Number(
-            data.goldPrice ||
-            0
-          );
-
-
-        goldPrice.value =
-          gp
-            ? formatNumber(gp)
-            : "";
-
-
-        saveData();
-
-        render();
-
-        resetTimer();
-
-
-        alert(
-          "Phục hồi dữ liệu thành công!"
-        );
-
-      }
-
-      catch(err){
-
-        console.error(err);
-
-        alert(
-          "Phục hồi thất bại: " +
-          (
-            err.message ||
-            "Lỗi không xác định"
-          )
-        );
-
-      }
-
-    };
-
-
-  reader.onerror =
-    function(){
-
-      alert(
-        "Không đọc được file. Vui lòng thử lại."
-      );
-
-    };
-
-
-  reader.readAsText(
-    file,
-    'utf-8'
-  );
-
-}
-
-
-window.importFromFile =
-  importFromFile;
-
-
-/* =====================================================
-   ĐỊNH DẠNG INPUT
-   ===================================================== */
-
-formatInput(
-  goldPrice
-);
-
-
-formatInput(
-  bankAmount
-);
-
-
-formatInput(
-  onlineAmountInput
-);
-
-
-/* =====================================================
-   ĐƠN GIÁ VÀNG
-   ===================================================== */
-
-function onGoldPriceInput(){
-
-  saveData();
-
-  render();
-
-  resetTimer();
-
-}
-
-
-goldPrice.addEventListener(
-  'input',
-  onGoldPriceInput
-);
-
-
-goldPrice.addEventListener(
-  'change',
-  onGoldPriceInput
-);
-
-
-goldPrice.addEventListener(
-  'blur',
-  onGoldPriceInput
-);
-
-
-/* =====================================================
-   AUTO LOCK
-   ===================================================== */
-
-if(autoLockSelect){
-
-  autoLockSelect.addEventListener(
-    "change",
-    saveAutoLockSetting
-  );
-
-}
-
-
-document.addEventListener(
-  "click",
-  resetTimer,
-  {
-    passive:true
-  }
-);
-
-
-document.addEventListener(
-  "keydown",
-  resetTimer
-);
-
-
-/* =====================================================
-   RESIZE BIỂU ĐỒ
-   ===================================================== */
-
-window.addEventListener(
-  'resize',
-  debounce(
-    () => {
-
-      drawChart(
-        _lastTotals.goldTotal,
-        _lastTotals.bankTotal,
-        _lastTotals.onlineTotal
-      );
-
-    },
-    120
-  )
-);
-
-
-/* =====================================================
-   KHỞI ĐỘNG
-   ===================================================== */
-
-window.onload =
-  function(){
-
-    loadAutoLockSetting();
-
-    lockScreen.style.display =
-      "flex";
-
-
-    if(
-      bankDate &&
-      !bankDate.value
-    ){
-
-      bankDate.value =
-        getToday();
-
-    }
-
-
-    if(
-      onlineDate &&
-      !onlineDate.value
-    ){
-
-      onlineDate.value =
-        getToday();
-
-    }
-
-  };
-
-
+})();
 </script>
-
-  
-  <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .catch(error => {
-        console.error('Không đăng ký được Service Worker:', error);
-      });
-  });
-}
-</script>
-
 </body>
-
 </html>
